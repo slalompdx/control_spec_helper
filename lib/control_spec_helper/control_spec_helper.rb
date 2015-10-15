@@ -39,9 +39,9 @@ module ControlSpecHelper
       map { |path| class_from_path(path) }
   end
 
-  def diff_profiles
+  def diff_profile
     diff_from_master.
-      select { |file| file.match(%r{site/profiles/manifests}) }.
+      select { |file| file.match(%r{site/profile/manifests}) }.
       map { |path| class_from_path(path) }
   end
 
@@ -67,14 +67,14 @@ module ControlSpecHelper
   # TODO: this could be much more accurate if we compiled catalogs for all roles
   # and then parsed them for included Classes, but that is very complicated
   def all_roles_with_changes
-    (diff_roles + diff_profiles.map do |klass|
+    (diff_roles + diff_profile.map do |klass|
       roles_that_include(klass)
     end.flatten).uniq
   end
 
   def spec_from_class(klass)
-    test = if klass =~ /profiles/
-             { :path => 'profiles', :type => nil }
+    test = if klass =~ /profile/
+             { :path => 'profile', :type => nil }
            elsif klass =~ /role/
              { :path => 'role', :type => 'acceptance' }
            else
@@ -94,13 +94,13 @@ module ControlSpecHelper
     debug "cd to #{Dir.pwd}"
   end
 
-  def profiles_fixtures
-    Dir.chdir(profiles_path) do
-      debug("cd to #{profiles_path}")
-      profiles_ln = './spec/fixtures/modules/profiles'
+  def profile_fixtures
+    Dir.chdir(profile_path) do
+      debug("cd to #{profile_path}")
+      profile_ln = './spec/fixtures/modules/profile'
 
       FileUtils.mkpath './spec/fixtures/modules/'
-      File.symlink(profiles_path, profiles_ln) unless File.symlink?(profiles_ln)
+      File.symlink(profile_path, profile_ln) unless File.symlink?(profile_ln)
 
       Dir.glob('../../modules/*').each do |folder|
         next unless File.directory?(folder)
@@ -116,7 +116,7 @@ module ControlSpecHelper
   def spec_clean
     Dir.chdir(project_root) do
       debug("cd to #{project_root}")
-      fixtures = File.join(profiles_path, 'spec', 'fixtures', 'modules')
+      fixtures = File.join(profile_path, 'spec', 'fixtures', 'modules')
       modules  = File.join(project_root, 'modules')
 
       abort if fixtures == '' || !fixtures
