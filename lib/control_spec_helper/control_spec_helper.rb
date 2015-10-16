@@ -2,9 +2,16 @@
 
 module ControlSpecHelper
   @@basepath='site'
+  @@basebranch='master'
+
   def set_basepath(new_basepath='site')
     @@basepath = new_basepath
   end
+
+  def set_basebranch(new_basebranch='master')
+    @@basebranch = new_basebranch
+  end
+
   def debug(msg)
     puts "DEBUG: #{msg}" if ENV['debug']
   end
@@ -29,18 +36,18 @@ module ControlSpecHelper
     File.join(project_root, @@basepath, 'profile')
   end
 
-  def diff_from_master
-    `git diff master --cached --diff-filter=ACMR --name-only`.split("\n")
+  def diff_from_base
+    `git diff #{@@basebranch} --cached --diff-filter=ACMR --name-only`.split("\n")
   end
 
   def diff_roles
-    diff_from_master.
+    diff_from_base.
       select { |file| file.match(%r{site/role/manifests}) }.
       map { |path| class_from_path(path) }
   end
 
   def diff_profile
-    diff_from_master.
+    diff_from_base.
       select { |file| file.match(%r{site/profile/manifests}) }.
       map { |path| class_from_path(path) }
   end
@@ -81,7 +88,7 @@ module ControlSpecHelper
              fail ArgumentError
            end
 
-    path = [project_root, basepath, test[:path], 'spec', test[:type]].compact
+    path = [project_root, @@basepath, test[:path], 'spec', test[:type]].compact
     File.join(path << (klass.split('::') - [test[:path]])) + '_spec.rb'
   end
 
@@ -100,7 +107,7 @@ module ControlSpecHelper
       profile_ln = './spec/fixtures/modules/profile'
 
       FileUtils.mkpath './spec/fixtures/modules/'
-      File.symlink(profile_path, profile_ln) unless File.symlink?(profile_ln)
+      File.symlink(profile_path, profile_ln) unless File.exists?(profile_ln)
 
       Dir.glob('../../modules/*').each do |folder|
         next unless File.directory?(folder)
