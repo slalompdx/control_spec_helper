@@ -1,15 +1,15 @@
 # rubocop:disable Style/DotPosition, Style/HashSyntax
 
 module ControlSpecHelper
-  @@basepath='site'
-  @@basebranch='master'
+  @basepath='site'
+  @basebranch='master'
 
   def set_basepath(new_basepath='site')
-    @@basepath = new_basepath
+    @basepath = new_basepath
   end
 
   def set_basebranch(new_basebranch='master')
-    @@basebranch = new_basebranch
+    @basebranch = new_basebranch
   end
 
   def debug(msg)
@@ -29,15 +29,15 @@ module ControlSpecHelper
   end
 
   def role_path
-    File.join(project_root, @@basepath, 'role')
+    File.join(project_root, @basepath, 'role')
   end
 
   def profile_path
-    File.join(project_root, @@basepath, 'profile')
+    File.join(project_root, @basepath, 'profile')
   end
 
   def diff_from_base
-    `git diff #{@@basebranch} --cached --diff-filter=ACMR --name-only`.split("\n")
+    `git diff #{@basebranch} --cached --diff-filter=ACMR --name-only`.split("\n")
   end
 
   def diff_roles
@@ -88,7 +88,7 @@ module ControlSpecHelper
              fail ArgumentError
            end
 
-    path = [project_root, @@basepath, test[:path], 'spec', test[:type]].compact
+    path = [project_root, @basepath, test[:path], 'spec', test[:type]].compact
     File.join(path << (klass.split('::') - [test[:path]])) + '_spec.rb'
   end
 
