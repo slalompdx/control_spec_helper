@@ -59,7 +59,6 @@ end
 desc 'prep for spec tests'
 task :spec_prep do
   r10k
-  set_basepath 'dist'
   profile_fixtures
 end
 
@@ -79,8 +78,6 @@ end
 
 desc 'Run acceptance tests for 1 or more roles'
 task :acceptance do
-  set_basebranch 'cloud'
-  set_basepath 'dist'
   Rake::Task['spec_clean'].invoke
 
   role = if ENV['role'] || ENV['roles']
@@ -108,8 +105,6 @@ end
 
 desc 'Run acceptance tests locally from SUT'
 task :serverspec do
-  set_basebranch 'cloud'
-  set_basepath 'dist'
   Dir.chdir(role_path) do
     if ENV['role']
       role_spec = ENV['role']
