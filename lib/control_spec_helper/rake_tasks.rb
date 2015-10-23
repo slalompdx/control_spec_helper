@@ -1,3 +1,4 @@
+# rubocop:disable Style/HashSyntax
 require 'rake'
 require 'rspec/core/rake_task'
 require 'puppet-lint/tasks/puppet-lint'
@@ -98,7 +99,7 @@ task :acceptance do
 
   puts "-- Acceptance tests for #{role.join(', ')} --"
   paths = role.map do |klass|
-    if klass.match(%r{^role})
+    if klass.match(/^role/)
       spec_from_class(klass)
     else
       spec_from_class("role::#{klass}")
@@ -124,21 +125,29 @@ task :serverspec do
 end
 
 # Override default puppet-lint choices
-# Must clear as it will not override the existing puppet-lint rake task since we require to import for
-# the PuppetLint::RakeTask
+# Must clear as it will not override the existing puppet-lint rake task since
+# we require to import for the PuppetLint::RakeTask
 Rake::Task[:lint].clear
-# Relative is not able to be set within the context of PuppetLint::RakeTask                          PuppetLint.configuration.relative = true
+# Relative is not able to be set within the context of PuppetLint::RakeTask
+PuppetLint.configuration.relative = true
 PuppetLint::RakeTask.new(:lint) do |config|
   config.fail_on_warnings = true
-  config.disable_checks = [
-      '80chars',
-      'class_inherits_from_params_class',
-      'class_parameter_defaults',
-      'documentation']
-  config.ignore_paths = ["tests/**/*.pp", "vendor/**/*.pp","examples/**/*.pp", "spec/**/*.pp", "pkg/**/*.pp"]
+  config.disable_checks = %w(
+    80chars
+    class_inherits_from_params_class
+    class_parameter_defaults
+    documentation
+  )
+  config.ignore_paths = %w(
+    tests/**/*.pp
+    vendor/**/*.pp
+    examples/**/*.pp
+    spec/**/*.pp
+    pkg/**/*.pp
+  )
 end
 
-desc "Display the list of available rake tasks"
+desc 'Display the list of available rake tasks'
 task :help do
-    system("rake -T")
+  system('rake -T')
 end
