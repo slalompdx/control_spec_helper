@@ -41,6 +41,12 @@ task :apply_debug do
   exec "#{puppet_cmd} --debug --trace"
 end
 
+desc 'run puppet apply (no r10k or git)'
+task :apply_standalone do
+  puts "Running 'puppet apply'"
+  exec "#{puppet_cmd} --debug --trace"
+end
+
 desc 'install or update pre-commit hook'
 task :hooks do
   include FileUtils
