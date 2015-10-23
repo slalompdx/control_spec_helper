@@ -134,8 +134,7 @@ PuppetLint::RakeTask.new(:lint) do |config|
       '80chars',
       'class_inherits_from_params_class',
       'class_parameter_defaults',
-      'documentation',
-      'single_quote_string_with_variables']
+      'documentation']
   config.ignore_paths = ["tests/**/*.pp", "vendor/**/*.pp","examples/**/*.pp", "spec/**/*.pp", "pkg/**/*.pp"]
 end
 
