@@ -1,15 +1,14 @@
 # rubocop:disable Style/DotPosition, Style/HashSyntax
 
 module ControlSpecHelper
-  @basepath='site'
-  @basebranch='master'
+  attr_writer :basepath, :basebranch
 
-  def set_basepath(new_basepath='site')
-    @basepath = new_basepath
+  def basepath
+    @basepath ||= 'site'
   end
 
-  def set_basebranch(new_basebranch='master')
-    @basebranch = new_basebranch
+  def basebranch
+    @basebranch ||= 'master'
   end
 
   def debug(msg)
