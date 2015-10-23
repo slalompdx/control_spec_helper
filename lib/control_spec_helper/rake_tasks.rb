@@ -19,6 +19,11 @@ task :r10k do
   r10k
 end
 
+desc 'print the command used to run puppet'
+task :puppet_cmd do
+  puts puppet_cmd
+end
+
 desc 'run puppet apply (enforce mode)'
 task :apply => [:git, :r10k] do
   puts "Running 'puppet apply'"
