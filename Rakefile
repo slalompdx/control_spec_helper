@@ -1,12 +1,15 @@
 require 'rake'
 require 'rake/packagetask'
 require 'rubygems/package_task'
+require 'rspec/core/rake_task'
 
 task :default do
     sh %{rake -T}
 end
 
 require 'fileutils'
+
+RSpec::Core::RakeTask.new(:spec)
 
 def version
   require 'control_spec_helper/version'
