@@ -114,7 +114,6 @@ module ControlSpecHelper
         old_path = File.join(File.dirname(__FILE__), folder)
         new_path = File.join("./spec/fixtures/modules/#{File.basename(folder)}")
 
-        File.symlink(old_path, new_path) unless File.symlink?(new_path)
         multiplatform_link(old_path, new_path) unless File.exists?(new_path)
       end
     end
