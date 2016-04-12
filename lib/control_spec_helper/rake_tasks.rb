@@ -129,6 +129,16 @@ task :serverspec do
   end
 end
 
+desc 'initialize local Vagrant environment for testing'
+task :vagrantup do
+  Dir.chdir(profile_path) do
+    system 'vagrant init slalompdx/centos-6-puppet4 --output fixtures/Vagrantfile'
+    Dir.chdir(File.join(profile_path, 'fixtures')) do
+      system 'vagrant up'
+    end
+  end
+end
+
 # Override default puppet-lint choices
 # Must clear as it will not override the existing puppet-lint rake task since
 # we require to import for the PuppetLint::RakeTask
