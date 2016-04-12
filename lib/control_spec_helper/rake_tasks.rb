@@ -84,11 +84,6 @@ task :spec do
   Rake::Task['spec_clean'].invoke
 end
 
-desc 'run unit tests'
-task :rspec do
-  Rake::Task['spec'].invoke
-end
-
 desc 'clean up after unit tests'
 task :spec_clean do
   spec_clean
