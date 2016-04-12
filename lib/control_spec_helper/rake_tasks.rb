@@ -133,8 +133,8 @@ desc 'initialize local Vagrant environment for testing'
 task :vagrantup do
   Dir.chdir(profile_path) do
     system 'unset RUBYLIB ; vagrant init slalompdx/centos-6-puppet4 --output spec/fixtures/Vagrantfile'
-    Dir.chdir(File.join(profile_path, 'spec', 'fixtures')) do
-      system 'unset RUBYLIB ; vagrant up'
+    File.join(profile_path, 'spec', 'fixtures')) do
+      system "unset RUBYLIB ; VAGRANT_VAGRANTFILE=#{File.join(profile_path, 'spec', 'fixtures')} vagrant up"
     end
   end
 end
