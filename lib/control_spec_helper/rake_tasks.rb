@@ -132,8 +132,8 @@ end
 desc 'initialize local Vagrant environment for testing'
 task :vagrantup do
   Dir.chdir(profile_path) do
-    system '/usr/local/bin/vagrant init slalompdx/centos-6-puppet4 --output fixtures/Vagrantfile'
-    Dir.chdir(File.join(profile_path, 'fixtures')) do
+    system '/usr/local/bin/vagrant init slalompdx/centos-6-puppet4 --output spec/fixtures/Vagrantfile'
+    Dir.chdir(File.join(profile_path, 'spec', 'fixtures')) do
       system '/usr/local/bin/vagrant up'
     end
   end
