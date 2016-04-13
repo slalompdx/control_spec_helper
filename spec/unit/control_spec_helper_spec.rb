@@ -61,6 +61,7 @@ describe 'control_spec_helper' do
 
   describe 'when root is not set' do
     describe 'when project_root is called' do
+      it 'calls the appropriate git command'
       let(:test_root) { '/test_root' }
 
       before do
@@ -72,5 +73,15 @@ describe 'control_spec_helper' do
         expect(@dummy_class.project_root).to eq('/test_root')
       end
     end
+  end
+
+  it 'should return a role_path based on basepath'
+  it 'should return a profile_path based on basepath'
+  it 'should return a diff from a local basebranch'
+  describe 'when diff_roles is called' do
+    it 'should return a diff from base as a map'
+  end
+  describe 'when diff_profile is called' do
+    it 'should return a diff from base as a map'
   end
 end
