@@ -143,4 +143,13 @@ module ControlSpecHelper
       File.symlink(source, dest)
     end
   end
+
+  def parse_vagrant_ssh_config(output)
+    sshconfig = Hash.new
+    output.lines.each do |line|
+      key, value = line.chomp.split(' ')
+      sshconfig[key] = value
+    end
+    sshconfig
+  end
 end

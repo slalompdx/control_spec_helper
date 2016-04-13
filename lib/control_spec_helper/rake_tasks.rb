@@ -3,6 +3,7 @@ require 'rake'
 require 'rspec/core/rake_task'
 require 'puppet-lint/tasks/puppet-lint'
 require 'puppet-syntax/tasks/puppet-syntax'
+require 'net/ssh'
 
 task :default => [:help]
 
@@ -78,6 +79,7 @@ end
 desc 'run unit tests'
 task :spec do
   Rake::Task['spec_prep'].invoke
+  Rake::Task['vagrantup'].invoke
   Dir.chdir(profile_path) do
     system 'bundle exec rake rspec'
   end
@@ -158,6 +160,17 @@ PuppetLint::RakeTask.new(:lint) do |config|
     spec/**/*.pp
     pkg/**/*.pp
   )
+end
+
+desc 'execute spec tests on running vagrant host'
+task :vagrantspec do
+  Dir.chdir(profile_path) do
+    sshconfig = parse_vagrant_ssh_config `unset RUBYLIB ; vagrant ssh-config`
+    Net::SSH.start(sshconfig['HostName'], sshconfig['User'], :password => 'vagrant', :port => sshconfig['Port']) do |ssh|
+      puts ssh.exec!('cd /vagrant && bundle install')
+      puts ssh.exec!('cd /vagrant && bundle exec rake spec')
+    end
+  end
 end
 
 desc 'Display the list of available rake tasks'
