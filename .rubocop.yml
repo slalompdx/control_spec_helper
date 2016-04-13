@@ -1,0 +1,10 @@
+Metrics/AbcSize:
+  Severity: warning
+Metrics/CyclomaticComplexity:
+  Severity: warning
+Metrics/LineLength:
+  Severity: warning
+Metrics/ModuleLength:
+  Severity: warning
+Metrics/PerceivedComplexity:
+  Severity: warning
