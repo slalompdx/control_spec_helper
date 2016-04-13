@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+# need to include the class we're testing somewhere
 class DummyClass
   include ControlSpecHelper
 end

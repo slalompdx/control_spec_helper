@@ -1,6 +1,6 @@
-# rubocop:disable Style/DotPosition, Style/HashSyntax
 require 'open3'
 
+# replacement for puppetlabs_spec_helper, for managing control repositories
 module ControlSpecHelper
   attr_writer :basepath, :basebranch
 
@@ -41,32 +41,32 @@ module ControlSpecHelper
   end
 
   def diff_roles
-    diff_from_base.
-      select { |file| file.match(%r{site/role/manifests}) }.
-      map { |path| class_from_path(path) }
+    diff_from_base
+      .select { |file| file.match(%r{site/role/manifests}) }
+      .map { |path| class_from_path(path) }
   end
 
   def diff_profile
-    diff_from_base.
-      select { |file| file.match(%r{site/profile/manifests}) }.
-      map { |path| class_from_path(path) }
+    diff_from_base
+      .select { |file| file.match(%r{site/profile/manifests}) }
+      .map { |path| class_from_path(path) }
   end
 
   def class_from_path(path)
     return nil unless path =~ /manifests.+\.pp$/
 
-    (path.sub(project_root + '/', '').
-      sub(/\.pp$/, '').
-      split('/') - %w(site manifests)).
-      join('::')
+    (path.sub(project_root + '/', '')
+      .sub(/\.pp$/, '')
+      .split('/') - %w(site manifests))
+      .join('::')
   end
 
   def roles_that_include(klass)
     Dir.chdir(role_path) do
       debug("cd to #{role_path}")
-      `git grep -l #{klass}`.split("\n").
-        map { |path| class_from_path(File.join(role_path, path)) }.
-        compact
+      `git grep -l #{klass}`.split("\n")
+        .map { |path| class_from_path(File.join(role_path, path)) }
+        .compact
     end
     debug "cd to #{Dir.pwd}"
   end
@@ -81,11 +81,11 @@ module ControlSpecHelper
 
   def spec_from_class(klass)
     test = if klass =~ /profile/
-             { :path => 'profile', :type => nil }
+             { path: 'profile', type: nil }
            elsif klass =~ /role/
-             { :path => 'role', :type => 'acceptance' }
+             { path: 'role', type: 'acceptance' }
            else
-             raise ArgumentError
+             fail ArgumentError
            end
 
     path = [project_root, basepath, test[:path], 'spec', test[:type]].compact
@@ -105,19 +105,20 @@ module ControlSpecHelper
     Dir.chdir(profile_path) do
       debug("cd to #{profile_path}")
       profile_ln = './spec/fixtures/modules/profile'
-
       FileUtils.mkpath './spec/fixtures/modules/'
       multiplatform_link(profile_path, profile_ln) unless File.exist?(profile_ln)
-
-      Dir.glob('../../modules/*').each do |folder|
-        next unless File.directory?(folder)
-        old_path = File.join(File.dirname(__FILE__), folder)
-        new_path = File.join("./spec/fixtures/modules/#{File.basename(folder)}")
-
-        multiplatform_link(old_path, new_path) unless File.exist?(new_path)
-      end
+      link_modules
     end
     debug "cd to #{Dir.pwd}"
+  end
+
+  def link_modules
+    Dir.glob('../../modules/*').each do |folder|
+      next unless File.directory?(folder)
+      old_path = File.join(File.dirname(__FILE__), folder)
+      new_path = File.join("./spec/fixtures/modules/#{File.basename(folder)}")
+      multiplatform_link(old_path, new_path) unless File.exist?(new_path)
+    end
   end
 
   def spec_clean
