@@ -106,7 +106,8 @@ module ControlSpecHelper
       debug("cd to #{profile_path}")
       profile_ln = './spec/fixtures/modules/profile'
       FileUtils.mkpath './spec/fixtures/modules/'
-      multiplatform_link(profile_path, profile_ln) unless File.exist?(profile_ln)
+      multiplatform_link(profile_path, profile_ln) unless
+        File.exist?(profile_ln)
       link_modules
     end
     debug "cd to #{Dir.pwd}"
@@ -138,7 +139,7 @@ module ControlSpecHelper
 
   def multiplatform_link(source, dest)
     if Gem.win_platform?
-      _stdin, _stdout, _stderr, wait_thr = Open3.popen3('cmd.exe', "/c mklink #{dest} #{source}")
+      _, _, _, wait_thr = Open3.popen3('cmd.exe', "/c mklink #{dest} #{source}")
       wait_thr.value.exitstatus
     else
       File.symlink(source, dest)

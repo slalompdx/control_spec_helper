@@ -173,7 +173,8 @@ task :vagrantspec do
   Rake::Task['vagrantup'].invoke
   Dir.chdir(profile_path) do
     sshconfig = parse_vagrant_ssh_config `unset RUBYLIB ; vagrant ssh-config`
-    Net::SSH.start(sshconfig['HostName'], sshconfig['User'], :password => 'vagrant', :port => sshconfig['Port']) do |ssh|
+    Net::SSH.start(sshconfig['HostName'], sshconfig['User'],
+                   :password => 'vagrant', :port => sshconfig['Port']) do |ssh|
       puts ssh.exec!('cd /vagrant && bundle install')
       puts ssh.exec!('cd /vagrant && bundle exec rake spec')
     end

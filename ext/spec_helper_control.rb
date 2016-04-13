@@ -30,8 +30,10 @@ else
         shell 'chown vagrant /controlrepo'
         install_package(host, 'zlib-devel')
         install_package(host, 'openssl-devel')
-        `scp -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no -r #{proj_root}  vagrant@#{host.connection.ip}:/`
-        shell 'cd /controlrepo && gem install ./control_spec_helper-0.0.1.gem && bundle install && rake r10k'
+        `scp -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no \
+          -r #{proj_root}  vagrant@#{host.connection.ip}:/`
+        shell 'cd /controlrepo && gem install ./control_spec_helper-0.0.1.gem \
+          && bundle install && rake r10k'
         shell 'mkdir -p /etc/facter/facts.d'
         role = ENV['role'].sub(/^role::/, '')
         shell "echo \"role=#{role}\" > /etc/facter/facts.d/role.txt"

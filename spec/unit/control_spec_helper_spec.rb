@@ -20,7 +20,8 @@ describe 'control_spec_helper' do
   end
 
   it 'should print the puppet command' do
-    cmd = "puppet apply manifests/site.pp \\\n      --modulepath $(echo `pwd`/modules:`pwd`/site) --hiera_config hiera.yaml"
+    cmd = "puppet apply manifests/site.pp \\\n\
+      --modulepath $(echo `pwd`/modules:`pwd`/site) --hiera_config hiera.yaml"
     expect(@dummy_class.puppet_cmd).to eq(cmd)
   end
 end
