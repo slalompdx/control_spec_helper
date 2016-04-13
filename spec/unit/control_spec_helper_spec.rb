@@ -62,6 +62,7 @@ describe 'control_spec_helper' do
   describe 'when root is not set' do
     describe 'when project_root is called' do
       git_string = 'git rev-parse --show-toplevel'
+
       it 'calls the appropriate git command' do
         expect(@dummy_class).to receive(:`).with(git_string)
           .and_return('foo')
@@ -97,34 +98,102 @@ describe 'control_spec_helper' do
 
   describe 'when diff_from_base is called' do
     git_command = 'git diff production --cached --diff-filter=ACMR --name-only'
+
     it 'should call the appropriate git command' do
       @dummy_class.basebranch = 'production'
       expect(@dummy_class).to receive(:`).with(git_command)
         .and_return("a\nb\nc")
       @dummy_class.diff_from_base
     end
+
     describe 'result' do
       before do
         @dummy_class.basebranch = 'production'
         allow(@dummy_class).to receive(:`).with(git_command)
           .and_return("a\nb\nc")
       end
+
       it 'should return an array' do
         expect(@dummy_class.diff_from_base).to eq(['a','b','c'])
       end
     end
   end
+
   describe 'when diff_roles is called' do
     it 'should return a diff from base as a map'
   end
+
   describe 'when diff_profile is called' do
     it 'should return a diff from base as a map'
   end
+
   describe 'when passed a file path' do
-    it 'should be able to extrapolate a puppet class name'
+    describe 'if the path does not include manifests' do
+      let(:path) { '/test_path/foobar.pp' }
+
+      it 'should return nil' do
+        expect(@dummy_class.class_from_path(path)).to eq(nil)
+      end
+    end
+
+    describe 'if the path does not end in pp' do
+      let(:path) { '/test_path/manifests/foobar' }
+      it 'should return nil' do
+        expect(@dummy_class.class_from_path(path)).to eq(nil)
+      end
+    end
+
+    context 'when path is simple profile path' do
+      let(:path) { '/test_path/site/profiles/manifests/klass.pp' }
+      it 'should extrapolate a puppet class name' do
+        allow(@dummy_class).to receive(:project_root).and_return('/test_path')
+        expect(@dummy_class.class_from_path(path)).to eq('profiles::klass')
+      end
+    end
+
+    context 'when path is namespaced profile path' do
+      let(:path) { '/test_path/site/profiles/manifests/klass/subklass.pp' }
+      it 'should extrapolate a namespaced puppet class name' do
+        allow(@dummy_class).to receive(:project_root).and_return('/test_path')
+        expect(@dummy_class.class_from_path(path))
+          .to eq('profiles::klass::subklass')
+      end
+    end
+
+    context 'when path is simple role path' do
+      let(:path) { '/test_path/site/role/manifests/klass.pp' }
+      it 'should extrapolate a puppet class name' do
+        allow(@dummy_class).to receive(:project_root).and_return('/test_path')
+        expect(@dummy_class.class_from_path(path)).to eq('role::klass')
+      end
+    end
+
+    context 'when path is namespaced role path' do
+      let(:path) { '/test_path/site/role/manifests/klass/subklass.pp' }
+      it 'should extrapolate a namespaced puppet class name' do
+        allow(@dummy_class).to receive(:project_root).and_return('/test_path')
+        expect(@dummy_class.class_from_path(path))
+          .to eq('role::klass::subklass')
+      end
+    end
   end
+
   describe 'when passed a puppet class' do
-    it 'should be able to identify roles that contain that class'
+    let(:klass) { 'klass' }
+    it 'should be able to identify roles that contain that class' do
+      Dir.stub(:chdir).with('/test_path/site/role')
+      allow(@dummy_class).to receive(:role_path)
+        .and_return('/test_path/site/role')
+      allow(@dummy_class).to receive(:project_root).and_return('/test_path')
+      allow(@dummy_class).to receive(:`).with('git grep -l klass')
+        .and_return("manifests/klass.pp\n" +
+                    "manifests/klass/repo.pp\n" +
+                    "manifests/stages.pp\n" +
+                    "spec/classes/klass_spec.rb\n" +
+                    "spec/classes/klass/repo_spec.rb\n" +
+                    'spec/classes/stages_spec.rb')
+      expect(@dummy_class.roles_that_include(klass)).to eq(['klass','klass::repo','stages'])
+    end
     it 'should be able to identify a spec file based on class name'
   end
   it 'should be able to identify all roles changed since last commit'

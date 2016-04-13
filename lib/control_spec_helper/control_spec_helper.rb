@@ -51,6 +51,7 @@ module ControlSpecHelper
       map { |path| class_from_path(path) }
   end
 
+  # This is for role and profile modules only
   def class_from_path(path)
     return nil unless path =~ /manifests.+\.pp$/
 
