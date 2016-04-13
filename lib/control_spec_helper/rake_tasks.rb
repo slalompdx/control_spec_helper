@@ -139,6 +139,13 @@ task :vagrantup do
   end
 end
 
+desc 'destroy local Vagrant environment'
+task :vagrantdestroy do
+  Dir.chdir(profile_path) do
+    system 'unset RUBYLIB ; vagrant destroy -f default'
+  end
+end
+
 # Override default puppet-lint choices
 # Must clear as it will not override the existing puppet-lint rake task since
 # we require to import for the PuppetLint::RakeTask
@@ -164,6 +171,7 @@ end
 
 desc 'execute spec tests on running vagrant host'
 task :vagrantspec do
+  Rake::Task['vagrantup'].invoke
   Dir.chdir(profile_path) do
     sshconfig = parse_vagrant_ssh_config `unset RUBYLIB ; vagrant ssh-config`
     Net::SSH.start(sshconfig['HostName'], sshconfig['User'], :password => 'vagrant', :port => sshconfig['Port']) do |ssh|
@@ -171,6 +179,7 @@ task :vagrantspec do
       puts ssh.exec!('cd /vagrant && bundle exec rake spec')
     end
   end
+  Rake::Task['vagrantdestroy'].invoke
 end
 
 desc 'Display the list of available rake tasks'
