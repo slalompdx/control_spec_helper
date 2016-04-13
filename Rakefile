@@ -22,8 +22,9 @@ namespace :package do
     spec = Gem::Specification.load('control_spec_helper.gemspec')
     begin
       Dir.mkdir('pkg')
-    rescue Errno::ENOENT => ex
-      puts ex
+    rescue Errno::EEXIST
+    rescue Errno::ENOENT => er
+      debug(er)
       exit 1
     end
     if Gem::Version.new(`gem -v`) >= Gem::Version.new('2.0.0.a')
