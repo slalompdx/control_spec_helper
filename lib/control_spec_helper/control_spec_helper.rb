@@ -85,7 +85,7 @@ module ControlSpecHelper
            elsif klass =~ /role/
              { :path => 'role', :type => 'acceptance' }
            else
-             fail ArgumentError
+             raise ArgumentError
            end
 
     path = [project_root, basepath, test[:path], 'spec', test[:type]].compact
@@ -107,14 +107,14 @@ module ControlSpecHelper
       profile_ln = './spec/fixtures/modules/profile'
 
       FileUtils.mkpath './spec/fixtures/modules/'
-      multiplatform_link(profile_path, profile_ln) unless File.exists?(profile_ln)
+      multiplatform_link(profile_path, profile_ln) unless File.exist?(profile_ln)
 
       Dir.glob('../../modules/*').each do |folder|
         next unless File.directory?(folder)
         old_path = File.join(File.dirname(__FILE__), folder)
         new_path = File.join("./spec/fixtures/modules/#{File.basename(folder)}")
 
-        multiplatform_link(old_path, new_path) unless File.exists?(new_path)
+        multiplatform_link(old_path, new_path) unless File.exist?(new_path)
       end
     end
     debug "cd to #{Dir.pwd}"
@@ -137,7 +137,7 @@ module ControlSpecHelper
 
   def multiplatform_link(source, dest)
     if Gem.win_platform?
-      stdin, stdout, stderr, wait_thr = Open3.popen3('cmd.exe', "/c mklink #{dest} #{source}")
+      _stdin, _stdout, _stderr, wait_thr = Open3.popen3('cmd.exe', "/c mklink #{dest} #{source}")
       wait_thr.value.exitstatus
     else
       File.symlink(source, dest)
@@ -145,7 +145,7 @@ module ControlSpecHelper
   end
 
   def parse_vagrant_ssh_config(output)
-    sshconfig = Hash.new
+    sshconfig = {}
     output.lines.each do |line|
       key, value = line.chomp.split(' ')
       sshconfig[key] = value

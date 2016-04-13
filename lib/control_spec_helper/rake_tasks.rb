@@ -104,7 +104,7 @@ task :acceptance do
 
   puts "-- Acceptance tests for #{role.join(', ')} --"
   paths = role.map do |klass|
-    if klass.match(/^role/)
+    if klass =~ /^role/
       spec_from_class(klass)
     else
       spec_from_class("role::#{klass}")
@@ -119,11 +119,11 @@ end
 desc 'Run acceptance tests locally from SUT'
 task :serverspec do
   Dir.chdir(role_path) do
-    if ENV['role']
-      role_spec = ENV['role']
-    else
-      role_spec = `facter role`.chomp.split('::').join('/')
-    end
+    role_spec = if ENV['role']
+                  ENV['role']
+                else
+                  `facter role`.chomp.split('::').join('/')
+                end
     ENV['serverspec'] = 'true'
     system "rspec spec/acceptance/#{role_spec}_spec.rb"
   end
