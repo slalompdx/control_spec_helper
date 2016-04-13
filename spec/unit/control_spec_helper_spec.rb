@@ -49,4 +49,28 @@ describe 'control_spec_helper' do
     cmd = "puppet apply manifests/site.pp \\\n      --modulepath $(echo `pwd`/modules:`pwd`/site) --hiera_config hiera.yaml"
     expect(@dummy_class.puppet_cmd).to eq(cmd)
   end
+
+  describe 'when root is set' do
+    describe 'when project_root is called' do
+      it 'should return a matching project_root' do
+        @dummy_class.instance_variable_set(:@root, '/projroot')
+        expect(@dummy_class.project_root).to eq('/projroot')
+      end
+    end
+  end
+
+  describe 'when root is not set' do
+    describe 'when project_root is called' do
+      let(:test_root) { '/test_root' }
+
+      before do
+        allow(@dummy_class).to receive(:`)
+          .with('git rev-parse --show-toplevel').and_return(test_root)
+      end
+
+      it 'should return a programmatically-determined project_root' do
+        expect(@dummy_class.project_root).to eq('/test_root')
+      end
+    end
+  end
 end
