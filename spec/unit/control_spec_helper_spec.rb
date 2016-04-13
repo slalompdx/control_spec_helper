@@ -63,8 +63,8 @@ describe 'control_spec_helper' do
 
   describe 'when root is not set' do
     describe 'when project_root is called' do
-      git_string = 'git rev-parse --show-toplevel'
-
+      it 'calls the appropriate git command'
+      let(:test_root) { '/test_root' }
       it 'calls the appropriate git command' do
         expect(@dummy_class).to receive(:`).with(git_string)
           .and_return('foo')
@@ -582,5 +582,15 @@ describe 'control_spec_helper' do
         .with('rm -rf /tmp/spec/fixtures/modules/*')
       @dummy_class.clean_spec
     end
+  end
+
+  it 'should return a role_path based on basepath'
+  it 'should return a profile_path based on basepath'
+  it 'should return a diff from a local basebranch'
+  describe 'when diff_roles is called' do
+    it 'should return a diff from base as a map'
+  end
+  describe 'when diff_profile is called' do
+    it 'should return a diff from base as a map'
   end
 end
