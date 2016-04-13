@@ -61,27 +61,182 @@ describe 'control_spec_helper' do
 
   describe 'when root is not set' do
     describe 'when project_root is called' do
-      it 'calls the appropriate git command'
-      let(:test_root) { '/test_root' }
+      git_string = 'git rev-parse --show-toplevel'
 
-      before do
-        allow(@dummy_class).to receive(:`)
-          .with('git rev-parse --show-toplevel').and_return(test_root)
+      it 'calls the appropriate git command' do
+        expect(@dummy_class).to receive(:`).with(git_string)
+          .and_return('foo')
+        @dummy_class.project_root
       end
 
-      it 'should return a programmatically-determined project_root' do
-        expect(@dummy_class.project_root).to eq('/test_root')
+      describe 'result' do
+        let(:test_root) { '/test_root' }
+
+        before do
+          allow(@dummy_class).to receive(:`).with(git_string)
+            .and_return(test_root)
+        end
+
+        it 'should return a programmatically-determined project_root' do
+          expect(@dummy_class.project_root).to eq('/test_root')
+        end
       end
     end
   end
 
-  it 'should return a role_path based on basepath'
-  it 'should return a profile_path based on basepath'
-  it 'should return a diff from a local basebranch'
+  it 'should return a role_path based on basepath' do
+    @dummy_class.instance_variable_set(:@root, '/projroot')
+    @dummy_class.basepath = 'dist'
+    expect(@dummy_class.role_path).to eq('/projroot/dist/role')
+  end
+
+  it 'should return a profile_path based on basepath' do
+    @dummy_class.instance_variable_set(:@root, '/projroot')
+    @dummy_class.basepath = 'dist'
+    expect(@dummy_class.profile_path).to eq('/projroot/dist/profile')
+  end
+
+  describe 'when diff_from_base is called' do
+    git_command = 'git diff production --cached --diff-filter=ACMR --name-only'
+
+    it 'should call the appropriate git command' do
+      @dummy_class.basebranch = 'production'
+      expect(@dummy_class).to receive(:`).with(git_command)
+        .and_return("a\nb\nc")
+      @dummy_class.diff_from_base
+    end
+
+    describe 'result' do
+      before do
+        @dummy_class.basebranch = 'production'
+        allow(@dummy_class).to receive(:`).with(git_command)
+          .and_return("a\nb\nc")
+      end
+
+      it 'should return an array' do
+        expect(@dummy_class.diff_from_base).to eq(['a','b','c'])
+      end
+    end
+  end
+
   describe 'when diff_roles is called' do
     it 'should return a diff from base as a map'
   end
+
   describe 'when diff_profile is called' do
     it 'should return a diff from base as a map'
+  end
+
+  describe 'when passed a file path' do
+    describe 'if the path does not include manifests' do
+      let(:path) { '/test_path/foobar.pp' }
+
+      it 'should return nil' do
+        expect(@dummy_class.class_from_path(path)).to eq(nil)
+      end
+    end
+
+    describe 'if the path does not end in pp' do
+      let(:path) { '/test_path/manifests/foobar' }
+      it 'should return nil' do
+        expect(@dummy_class.class_from_path(path)).to eq(nil)
+      end
+    end
+
+    context 'when path is simple profile path' do
+      let(:path) { '/test_path/site/profiles/manifests/klass.pp' }
+      it 'should extrapolate a puppet class name' do
+        allow(@dummy_class).to receive(:project_root).and_return('/test_path')
+        expect(@dummy_class.class_from_path(path)).to eq('profiles::klass')
+      end
+    end
+
+    context 'when path is namespaced profile path' do
+      let(:path) { '/test_path/site/profiles/manifests/klass/subklass.pp' }
+      it 'should extrapolate a namespaced puppet class name' do
+        allow(@dummy_class).to receive(:project_root).and_return('/test_path')
+        expect(@dummy_class.class_from_path(path))
+          .to eq('profiles::klass::subklass')
+      end
+    end
+
+    context 'when path is simple role path' do
+      let(:path) { '/test_path/site/role/manifests/klass.pp' }
+      it 'should extrapolate a puppet class name' do
+        allow(@dummy_class).to receive(:project_root).and_return('/test_path')
+        expect(@dummy_class.class_from_path(path)).to eq('role::klass')
+      end
+    end
+
+    context 'when path is namespaced role path' do
+      let(:path) { '/test_path/site/role/manifests/klass/subklass.pp' }
+      it 'should extrapolate a namespaced puppet class name' do
+        allow(@dummy_class).to receive(:project_root).and_return('/test_path')
+        expect(@dummy_class.class_from_path(path))
+          .to eq('role::klass::subklass')
+      end
+    end
+  end
+
+  describe 'when passed a puppet class' do
+    let(:klass) { 'role::klass' }
+    it 'should be able to identify roles that contain that class' do
+      allow(Dir).to receive(:chdir).with('/test_path/site/role').and_return(true)
+      allow(@dummy_class).to receive(:role_path)
+        .and_return('/test_path/site/role')
+      allow(@dummy_class).to receive(:project_root).and_return('/test_path')
+      allow(@dummy_class).to receive(:`).with('git grep -l role::klass')
+        .and_return("manifests/klass.pp\n" +
+                    "manifests/klass/repo.pp\n" +
+                    "manifests/stages.pp\n" +
+                    "spec/classes/klass_spec.rb\n" +
+                    "spec/classes/klass/repo_spec.rb\n" +
+                    'spec/classes/stages_spec.rb')
+#      expect(@dummy_class.roles_that_include('klass')).to eq(['klass','klass::repo','stages'])
+    end
+    describe 'when asked to identify a spec file based on class name' do
+      let(:klass) { 'klass' }
+      it 'should fail if class is neither role nor profile' do
+        expect(@dummy_class.spec_from_class('klass')).to raise_error
+      end
+      it 'should be able to identify a spec file based on class name'
+    end
+  end
+  it 'should be able to identify all roles changed since last commit'
+  describe 'when r10k is called' do
+    it 'should call the appropriate r10k command'
+    describe 'when debug environmental variable is set' do
+      it 'should print its current project directory'
+      it 'should print its actual working directory'
+    end
+  end
+  describe 'when profile_fixtures is called' do
+    describe 'when debug environmental variable is set' do
+      it 'should print its current profile_path directory'
+      it 'should print its actual working directory'
+    end
+    it 'should create a modules directory inside fixtures'
+    describe 'when a profile directory exists inside fixtures' do
+      it 'should not create a new symlink'
+    end
+    describe 'when a profile directory does not exist inside fixtures' do
+      it 'should create a symlink to the profile directory'
+    end
+    describe 'for each file in the modules directory' do
+      it 'should skip any file that is not a directory'
+      it 'should symlink the module into the fixtures directory'
+    end
+  end
+  describe 'when spec_clean is called' do
+    describe 'when debug environmental variable is set' do
+      it 'should print its current project directory'
+      it 'should print its actual working directory'
+    end
+    it 'should abort if fixtures is empty'
+    it 'should abort is fixtures is null'
+    it 'should abort if modules is empty'
+    it 'should abort if modules is null'
+    it 'calls the appropriate command to remove fixtures'
+    it 'calls the appropriate command to remove modules'
   end
 end

@@ -51,6 +51,7 @@ module ControlSpecHelper
       map { |path| class_from_path(path) }
   end
 
+  # This is for role and profile modules only
   def class_from_path(path)
     return nil unless path =~ /manifests.+\.pp$/
 
@@ -63,7 +64,7 @@ module ControlSpecHelper
   def roles_that_include(klass)
     Dir.chdir(role_path) do
       debug("cd to #{role_path}")
-      `git grep -l #{klass}`.split("\n").
+      puts `git grep -l #{klass}`.split("\n").
         map { |path| class_from_path(File.join(role_path, path)) }.
         compact
     end
