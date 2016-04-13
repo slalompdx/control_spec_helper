@@ -80,9 +80,7 @@ desc 'run unit tests'
 task :spec do
   Rake::Task['spec_prep'].invoke
   Rake::Task['vagrantup'].invoke
-  Dir.chdir(profile_path) do
-    system 'bundle exec rake rspec'
-  end
+  Rake::Task['vagrantspec'].invoke
   Rake::Task['spec_clean'].invoke
 end
 
@@ -143,6 +141,7 @@ desc 'destroy local Vagrant environment'
 task :vagrantdestroy do
   Dir.chdir(profile_path) do
     system 'unset RUBYLIB ; vagrant destroy -f default'
+    FileUtils.rm('Vagrantfile')
   end
 end
 
