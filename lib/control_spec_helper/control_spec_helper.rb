@@ -12,7 +12,7 @@ module ControlSpecHelper
   end
 
   def debug(msg)
-    puts "DEBUG: #{msg}" if ENV['debug']
+    $stderr.puts "DEBUG: #{msg}" if ENV['debug']
   end
 
   def puppet_cmd
