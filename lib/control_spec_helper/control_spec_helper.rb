@@ -12,7 +12,7 @@ module ControlSpecHelper
   end
 
   def debug(msg)
-    puts "DEBUG: #{msg}" if ENV['debug']
+    $stderr.puts "DEBUG: #{msg}" if ENV['debug']
   end
 
   def puppet_cmd
@@ -90,6 +90,7 @@ module ControlSpecHelper
 
     path = [project_root, @basepath, test[:path], 'spec', test[:type]].compact
     File.join(path << (klass.split('::') - [test[:path]])) + '_spec.rb'
+
   end
 
   def r10k
