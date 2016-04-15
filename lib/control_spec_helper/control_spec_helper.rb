@@ -16,7 +16,7 @@ module ControlSpecHelper
   end
 
   def debug(msg)
-    $stderr.puts "DEBUG: #{msg}" if ENV['debug']
+    $stderr.puts "DEBUG: #{msg}" unless ENV['debug'].nil?
   end
 
   def puppet_cmd
@@ -91,7 +91,6 @@ module ControlSpecHelper
            else
              fail ArgumentError
            end
-
     path = [project_root, @basepath, test[:path], 'spec', test[:type]].compact
     File.join(path << (klass.split('::') - [test[:path]])) + '_spec.rb'
 
