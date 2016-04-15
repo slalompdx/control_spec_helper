@@ -109,6 +109,7 @@ module ControlSpecHelper
 
   def profile_fixtures
     Dir.chdir(profile_path) do
+      debug(ENV['debug'])
       debug("cd to #{profile_path}")
       profile_ln = './spec/fixtures/modules/profile'
 
