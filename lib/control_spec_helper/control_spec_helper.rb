@@ -3,6 +3,10 @@
 module ControlSpecHelper
   attr_writer :basepath, :basebranch
 
+  def expanded_file_name
+    __FILE__
+  end
+
   def basepath
     @basepath ||= 'site'
   end
@@ -112,7 +116,7 @@ module ControlSpecHelper
 
       Dir.glob('../../modules/*').each do |folder|
         next unless File.directory?(folder)
-        old_path = File.join(File.dirname(__FILE__), folder)
+        old_path = File.join(File.dirname(expanded_file_name), folder)
         new_path = File.join("./spec/fixtures/modules/#{File.basename(folder)}")
 
         File.symlink(old_path, new_path) unless File.symlink?(new_path)
