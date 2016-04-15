@@ -16,7 +16,7 @@ module ControlSpecHelper
   end
 
   def debug(msg)
-    $stderr.puts "DEBUG: #{msg}" if ENV['debug']
+    $stderr.puts "DEBUG: #{msg}" unless ENV['debug'].nil?
   end
 
   def puppet_cmd
@@ -108,6 +108,7 @@ module ControlSpecHelper
 
   def profile_fixtures
     Dir.chdir(profile_path) do
+      debug(ENV['debug'])
       debug("cd to #{profile_path}")
       profile_ln = './spec/fixtures/modules/profile'
 
