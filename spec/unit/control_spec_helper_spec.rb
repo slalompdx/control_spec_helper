@@ -120,11 +120,33 @@ describe 'control_spec_helper' do
   end
 
   describe 'when diff_roles is called' do
-    it 'should return a diff from base as a map'
+
+    it 'should return a diff from base as an array' do
+      allow(@dummy_class).to receive(:diff_from_base).and_return(['a','/tmp/foo/site/role/manifests/foo.pp','/tmp/foo/site/role/manifests/bar.pp'])
+      expect(@dummy_class).to receive(:diff_roles).and_return(['role::foo','role::bar'])
+      @dummy_class.diff_roles
+    end
+
+    it 'should ignore classes in base that are not roles' do
+      allow(@dummy_class).to receive(:diff_from_base).and_return(['/tmp/foo/site/profile/manifests/foo.pp','/tmp/foo/site/role/manifests/bar.pp','/tmp/foo/modules/baz/manifests/baz.pp','/tmp/foo/site/role/manifests/fubar.pp'])
+      expect(@dummy_class).to receive(:diff_roles).and_return(['role::bar','role::fubar'])
+      @dummy_class.diff_roles
+    end
   end
 
   describe 'when diff_profile is called' do
-    it 'should return a diff from base as a map'
+
+    it 'should return a diff from base as a map' do
+      allow(@dummy_class).to receive(:diff_from_base).and_return(['a','/tmp/foo/site/profile/manifests/foo.pp','/tmp/foo/site/profile/manifests/bar.pp'])
+      expect(@dummy_class).to receive(:diff_profile).and_return(['profile::foo','profile::bar'])
+      @dummy_class.diff_profile
+    end
+
+    it 'should ignore classes in base that are not profiles' do
+      allow(@dummy_class).to receive(:diff_from_base).and_return(['/tmp/foo/site/profile/manifests/foo.pp','/tmp/foo/site/role/manifests/bar.pp','/tmp/foo/modules/baz/manifests/baz.pp','/tmp/foo/site/profile/manifests/fubar.pp'])
+      expect(@dummy_class).to receive(:diff_roles).and_return(['profile::foo','profile::fubar'])
+      @dummy_class.diff_roles
+    end
   end
 
   describe 'when passed a file path' do
@@ -228,7 +250,6 @@ describe 'control_spec_helper' do
     end
   end
 
-  it 'should be able to identify all roles changed since last commit'
   describe 'when r10k is called' do
 
     it 'should call the appropriate r10k command' do
