@@ -316,12 +316,6 @@ describe 'control_spec_helper' do
         allow(@dummy_class).to receive(:profile_path).and_return('/')
         allow(File).to receive(:symlink)
           .with('/', './spec/fixtures/modules/profile')
-        cached_env_debug = ENV['debug']
-        ENV['debug'] = 'true'
-      end
-
-      after(:each) do
-        ENV['debug'] = cached_env_debug
       end
 
       context 'if a profile link already exists' do
@@ -332,7 +326,7 @@ describe 'control_spec_helper' do
           expect(File).to_not receive(:symlink)
             .with('/', './spec/fixtures/modules/profile')
           allow(FileUtils).to receive(:mkpath).with('./spec/fixtures/modules/')
-          @dummy_class.profile_fixtures
+          expect { @dummy_class.profile_fixtures }
         end
       end
 
