@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   # Runtime dependencies, but also probably dependencies of requiring projects
   s.add_runtime_dependency 'rake'
   s.add_runtime_dependency 'rspec-puppet'
+  s.add_runtime_dependency 'puppet', ">= 4.0"
   s.add_runtime_dependency 'puppet-lint'
   s.add_runtime_dependency 'puppet-syntax'
   s.add_runtime_dependency 'mocha'
