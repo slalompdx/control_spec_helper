@@ -1,4 +1,5 @@
 module ControlSpecHelper
+  $stderr.puts 'GARR debugging'
   attr_writer :basepath, :basebranch
 
   def expanded_file_name
