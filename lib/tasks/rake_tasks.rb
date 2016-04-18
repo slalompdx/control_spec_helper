@@ -1,4 +1,3 @@
-# rubocop:disable Style/HashSyntax
 require 'rake'
 require 'rspec/core/rake_task'
 require 'puppet-lint/tasks/puppet-lint'
