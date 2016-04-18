@@ -8,12 +8,12 @@ shared_context "rake" do
   subject         { rake[task_name] }
 
   def loaded_files_excluding_current_rake_file
-    $".reject {|file| file == Rails.root.join("#{task_path}.rake").to_s }
+    $".reject {|file| file == "#{File.dirname(__FILE__)}/../../../#{task_path}.rake" }
   end
 
   before do
     Rake.application = rake
-    Rake.application.rake_require(task_path, [Rails.root.to_s], loaded_files_excluding_current_rake_file)
+    Rake.application.rake_require(task_path, ["#{File.dirname(__FILE__)}/../../../"], loaded_files_excluding_current_rake_file)
 
     Rake::Task.define_task(:environment)
   end
