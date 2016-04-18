@@ -1,5 +1,3 @@
-# rubocop:disable Style/DotPosition, Style/HashSyntax
-
 module ControlSpecHelper
   attr_writer :basepath, :basebranch
 
