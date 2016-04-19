@@ -734,27 +734,27 @@ describe 'control_spec_helper' do
 
       context 'when passed a profile class' do
         it 'should be able to identify a spec file based on class name' do
-          allow(@dummy_class).to receive(:project_root).and_return('/test_root')
+          allow(@dummy_class).to receive(:project_root).and_return('/')
           allow(@dummy_class).to receive(:basepath)
             .and_return('/test_root/control_spec_helper')
           expect(@dummy_class.spec_from_class(klass))
-            .to eq('/test_root/profile/spec/klass_spec.rb')
+            .to eq('/test_root/control_spec_helper/profile/spec/klass_spec.rb')
         end
 
         it 'should place a profile spec in the correct path' do
-          allow(@dummy_class).to receive(:project_root).and_return('/test_root')
+          allow(@dummy_class).to receive(:project_root).and_return('/')
           allow(@dummy_class).to receive(:basepath)
             .and_return('/test_root/control_spec_helper')
           expect(@dummy_class.spec_from_class(klass))
-            .to eq('/test_root/profile/spec/klass_spec.rb')
+            .to eq('/test_root/control_spec_helper/profile/spec/klass_spec.rb')
         end
 
         it 'should place a role spec in the correct path' do
-          allow(@dummy_class).to receive(:project_root).and_return('/test_root')
+          allow(@dummy_class).to receive(:project_root).and_return('/')
           allow(@dummy_class).to receive(:basepath)
             .and_return('/test_root/control_spec_helper')
           expect(@dummy_class.spec_from_class(role_klass))
-            .to eq('/test_root/role/spec/acceptance/klass_spec.rb')
+            .to eq('/test_root/control_spec_helper/role/spec/acceptance/klass_spec.rb')
         end
       end
     end
