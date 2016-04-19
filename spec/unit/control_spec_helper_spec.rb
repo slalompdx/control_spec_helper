@@ -282,28 +282,40 @@ describe 'control_spec_helper' do
     it 'should call the appropriate r10k command' do
       allow(@dummy_class).to receive(:project_root).and_return('/')
       expect(@dummy_class).to receive(:`).with('r10k puppetfile install')
-      @dummy_class.r10k
+      expect { @dummy_class.r10k }.to output(/Installing modules with r10k/).to_stdout
     end
 
     describe 'when debug environmental variable is set' do
       cached_env_debug = ''
+      original_stderr = $stderr
+      original_stdout = $stdout
       before(:each) do
         allow(@dummy_class).to receive(:project_root).and_return('/')
         allow(@dummy_class).to receive(:`).with('r10k puppetfile install')
-        cached_env_debug = ENV['debug']
-        ENV['debug'] = 'true'
+        # Redirect stderr and stdout
+        $stderr = File.new(File.join('/', 'dev', 'null'), 'w')
+        $stdout = File.new(File.join('/', 'dev', 'null'), 'w')
       end
       after(:each) do
-        ENV['debug'] = cached_env_debug
+        $stderr = original_stderr
+        $stdout = original_stdout
       end
 
       it 'should print its current project directory' do
+        cached_env_debug = ENV['debug']
+        ENV['debug'] = 'true'
+        expect { @dummy_class.r10k }.to output(/Installing modules with r10k/).to_stdout
         expect { @dummy_class.r10k }.to output(%r{cd to /}).to_stderr
+        ENV['debug'] = cached_env_debug
       end
 
       it 'should print its actual working directory' do
+        cached_env_debug = ENV['debug']
+        ENV['debug'] = 'true'
         allow(Dir).to receive(:pwd).and_return('/tmp')
+        expect { @dummy_class.r10k }.to output(/Installing modules with r10k/).to_stdout
         expect { @dummy_class.r10k }.to output(%r{cd to /tmp}).to_stderr
+        ENV['debug'] = cached_env_debug
       end
     end
   end
