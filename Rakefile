@@ -18,7 +18,6 @@ def version
   ControlSpecHelper::Version::STRING
 end
 
-
 namespace :package do
   desc "Create the gem"
   task :gem do
@@ -51,15 +50,19 @@ namespace :fixtures do
 
   desc "Prepare fixtures repository"
   task :prep => [:create] do
-    unless File.exist?('fixtures/puppet-control')
-      repo = Git.clone('https://github.com/slalompdx/puppet-control.git',
-                       'puppet-control',
-                       :path => 'fixtures',
-                       :branch => 'fixture')
-      Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
-        `bundle config local.control_spec_helper ../..`
-        puts "#{`bundle install`}"
+    begin
+      unless File.exist?('fixtures/puppet-control')
+        repo = Git.clone('https://github.com/slalompdx/puppet-control.git',
+                         'puppet-control',
+                         :path => 'fixtures',
+                         :branch => 'fixture')
+        Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
+          `bundle config local.control_spec_helper ../..`
+          puts "#{`bundle install`}"
+        end
       end
+    ensure
+      `bundle config --delete local.control_spec_helper`
     end
   end
 end

@@ -1,9 +1,7 @@
 # lib/tasks/acceptance.rb
 
 desc 'Run acceptance tests for 1 or more roles'
-task :acceptance do
-  Rake::Task['spec_clean'].invoke
-
+task :acceptance => [:spec_clean] do
   role = if ENV['role'] || ENV['roles']
            (ENV['role'] || ENV['roles']).split(',')
          elsif !diff_roles.empty?
