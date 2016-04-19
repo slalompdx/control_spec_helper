@@ -13,7 +13,9 @@ shared_context "rake" do
 
   before do
     Rake.application = rake
-    Rake.application.rake_require(task_path, ["#{File.dirname(__FILE__)}/../../../"], loaded_files_excluding_current_rake_file)
+    require 'pry'
+    binding.pry
+    Rake.application.rake_require(task_path, ["#{File.dirname(__FILE__)}/../../../lib"], loaded_files_excluding_current_rake_file)
 
     Rake::Task.define_task(:environment)
   end
