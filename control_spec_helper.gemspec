@@ -25,4 +25,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'mocha'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'fantaskspec'
+  s.add_development_dependency 'git'
 end
