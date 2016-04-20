@@ -238,8 +238,8 @@ describe 'control_spec_helper' do
                     "spec/classes/klass_spec.rb\n" \
                     "spec/classes/klass/repo_spec.rb\n" \
                     'spec/classes/stages_spec.rb')
-      expect { @dummy_class.roles_that_include('klass') }
-        .to output("::klass\n::klass::repo\n::stages\n").to_stdout
+      expect(@dummy_class.roles_that_include('klass'))
+        .to eq(["::klass", "::klass::repo", "::stages"])
     end
 
     describe 'when asked to identify a spec file based on class name' do
