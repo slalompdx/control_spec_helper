@@ -393,7 +393,7 @@ describe 'control_spec_helper' do
               allow(File).to receive(:directory?)
                 .with('bar').and_return(true)
               allow(File).to receive(:dirname)
-                .with(@dummy_class.expanded_file_name).and_return('/tmp')
+                .with(@dummy_class.file_name).and_return('/tmp')
               allow(File).to receive(:symlink?)
                 .with('./spec/fixtures/modules/foo').and_return(false)
               allow(File).to receive(:symlink?)
