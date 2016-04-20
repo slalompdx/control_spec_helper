@@ -3,7 +3,7 @@
 module ControlSpecHelper
   attr_writer :basepath, :basebranch
 
-  def expanded_file_name
+  def file_name
     __FILE__
   end
 
@@ -66,13 +66,15 @@ module ControlSpecHelper
   end
 
   def roles_that_include(klass)
+    roles = ''
     Dir.chdir(role_path) do
       debug("cd to #{role_path}")
-      puts `git grep -l #{klass}`.split("\n").
+      roles = `git grep -l #{klass}`.split("\n").
         map { |path| class_from_path(File.join(role_path, path)) }.
         compact
     end
     debug "cd to #{Dir.pwd}"
+    roles
   end
 
   # TODO: this could be much more accurate if we compiled catalogs for all roles
@@ -115,7 +117,7 @@ module ControlSpecHelper
 
       Dir.glob('../../modules/*').each do |folder|
         next unless File.directory?(folder)
-        old_path = File.join(File.dirname(expanded_file_name), folder)
+        old_path = File.join(File.dirname(file_name), folder)
         new_path = File.join("./spec/fixtures/modules/#{File.basename(folder)}")
 
         File.symlink(old_path, new_path) unless File.symlink?(new_path)
