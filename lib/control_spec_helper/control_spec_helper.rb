@@ -1,7 +1,9 @@
-# rubocop:disable Style/DotPosition, Style/HashSyntax
-
 module ControlSpecHelper
   attr_writer :basepath, :basebranch
+
+  def expanded_file_name
+    __FILE__
+  end
 
   def basepath
     @basepath ||= 'site'
@@ -12,7 +14,7 @@ module ControlSpecHelper
   end
 
   def debug(msg)
-    puts "DEBUG: #{msg}" if ENV['debug']
+    $stderr.puts "DEBUG: #{msg}" unless ENV['debug'].nil?
   end
 
   def puppet_cmd
@@ -28,11 +30,11 @@ module ControlSpecHelper
   end
 
   def role_path
-    File.join(project_root, @basepath, 'role')
+    File.join(project_root, basepath, 'role')
   end
 
   def profile_path
-    File.join(project_root, @basepath, 'profile')
+    File.join(project_root, basepath, 'profile')
   end
 
   def diff_from_base
@@ -51,6 +53,7 @@ module ControlSpecHelper
       map { |path| class_from_path(path) }
   end
 
+  # This is for role and profile modules only
   def class_from_path(path)
     return nil unless path =~ /manifests.+\.pp$/
 
@@ -63,7 +66,7 @@ module ControlSpecHelper
   def roles_that_include(klass)
     Dir.chdir(role_path) do
       debug("cd to #{role_path}")
-      `git grep -l #{klass}`.split("\n").
+      puts `git grep -l #{klass}`.split("\n").
         map { |path| class_from_path(File.join(role_path, path)) }.
         compact
     end
@@ -87,8 +90,9 @@ module ControlSpecHelper
              fail ArgumentError
            end
 
-    path = [project_root, @basepath, test[:path], 'spec', test[:type]].compact
+    path = [project_root, basepath, test[:path], 'spec', test[:type]].compact
     File.join(path << (klass.split('::') - [test[:path]])) + '_spec.rb'
+
   end
 
   def r10k
@@ -102,6 +106,7 @@ module ControlSpecHelper
 
   def profile_fixtures
     Dir.chdir(profile_path) do
+      debug(ENV['debug'])
       debug("cd to #{profile_path}")
       profile_ln = './spec/fixtures/modules/profile'
 
@@ -110,7 +115,7 @@ module ControlSpecHelper
 
       Dir.glob('../../modules/*').each do |folder|
         next unless File.directory?(folder)
-        old_path = File.join(File.dirname(__FILE__), folder)
+        old_path = File.join(File.dirname(expanded_file_name), folder)
         new_path = File.join("./spec/fixtures/modules/#{File.basename(folder)}")
 
         File.symlink(old_path, new_path) unless File.symlink?(new_path)
