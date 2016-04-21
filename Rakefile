@@ -18,7 +18,6 @@ def version
   ControlSpecHelper::Version::STRING
 end
 
-
 namespace :package do
   desc "Create the gem"
   task :gem do
