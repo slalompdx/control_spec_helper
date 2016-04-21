@@ -252,27 +252,27 @@ describe 'control_spec_helper' do
 
       context 'when passed a profile class' do
         it 'should be able to identify a spec file based on class name' do
-          allow(@dummy_class).to receive(:project_root).and_return('/test_root')
+          allow(@dummy_class).to receive(:project_root).and_return('/')
           allow(@dummy_class).to receive(:basepath)
             .and_return('/test_root/control_spec_helper')
           expect(@dummy_class.spec_from_class(klass))
-            .to eq('/test_root/profile/spec/klass_spec.rb')
+            .to eq('/test_root/control_spec_helper/profile/spec/klass_spec.rb')
         end
 
         it 'should place a profile spec in the correct path' do
-          allow(@dummy_class).to receive(:project_root).and_return('/test_root')
+          allow(@dummy_class).to receive(:project_root).and_return('/')
           allow(@dummy_class).to receive(:basepath)
             .and_return('/test_root/control_spec_helper')
           expect(@dummy_class.spec_from_class(klass))
-            .to eq('/test_root/profile/spec/klass_spec.rb')
+            .to eq('/test_root/control_spec_helper/profile/spec/klass_spec.rb')
         end
 
         it 'should place a role spec in the correct path' do
-          allow(@dummy_class).to receive(:project_root).and_return('/test_root')
+          allow(@dummy_class).to receive(:project_root).and_return('/')
           allow(@dummy_class).to receive(:basepath)
             .and_return('/test_root/control_spec_helper')
           expect(@dummy_class.spec_from_class(role_klass))
-            .to eq('/test_root/role/spec/acceptance/klass_spec.rb')
+            .to eq('/test_root/control_spec_helper/role/spec/acceptance/klass_spec.rb')
         end
       end
     end
@@ -596,14 +596,14 @@ describe 'control_spec_helper' do
     expect(@dummy_class.profile_path).to eq('/projroot/dist/profile')
   end
 
-  it 'should return a diff from a local basebranch' do
+  context 'should return a diff from a local basebranch' do
     it 'should return an array' do
       expect(@dummy_class.diff_from_base).to eq(['a','b','c'])
     end
   end
 
   describe 'when diff_roles is called' do
-    it 'should return a diff from base as a map'
+    it 'should return a diff from base as a map' do
       allow(@dummy_class).to receive(:diff_from_base).and_return(['/tmp/foo/site/profile/manifests/foo.pp','/tmp/foo/site/role/manifests/bar.pp','/tmp/foo/modules/baz/manifests/baz.pp','/tmp/foo/site/role/manifests/fubar.pp'])
       expect(@dummy_class).to receive(:diff_roles).and_return(['role::bar','role::fubar'])
       @dummy_class.diff_roles
