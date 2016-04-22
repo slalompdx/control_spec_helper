@@ -279,10 +279,23 @@ describe 'control_spec_helper' do
   end
 
   describe 'when r10k is called' do
+    before(:each) do
+      $orig_stderr = $stderr
+      $orig_stdout = $stdout
+      $stdout = File.open('/dev/null', 'w')
+      $stderr = File.open('/dev/null', 'w')
+    end
+
+    after(:each) do
+      $stdout = $orig_stdout
+      $stderr = $orig_stderr
+    end
+
     it 'should call the appropriate r10k command' do
       allow(@dummy_class).to receive(:project_root).and_return('/')
       expect(@dummy_class).to receive(:`).with('r10k puppetfile install')
-      @dummy_class.r10k
+      expect { @dummy_class.r10k }.to output(/Installing modules with r10k/)
+        .to_stdout
     end
 
     describe 'when debug environmental variable is set' do
@@ -298,11 +311,15 @@ describe 'control_spec_helper' do
       end
 
       it 'should print its current project directory' do
+        expect { @dummy_class.r10k }.to output(/Installing modules with r10k/)
+          .to_stdout
         expect { @dummy_class.r10k }.to output(%r{cd to /}).to_stderr
       end
 
       it 'should print its actual working directory' do
         allow(Dir).to receive(:pwd).and_return('/tmp')
+        expect { @dummy_class.r10k }.to output(/Installing modules with r10k/)
+          .to_stdout
         expect { @dummy_class.r10k }.to output(%r{cd to /tmp}).to_stderr
       end
     end
