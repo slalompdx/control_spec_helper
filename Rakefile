@@ -5,7 +5,7 @@ require 'rspec/core/rake_task'
 require 'git'
 
 task :default do
-    sh %{rake -T}
+  sh %{rake -T}
 end
 
 require 'fileutils'
