@@ -1,5 +1,3 @@
-# rubocop:disable Style/DotPosition, Style/HashSyntax
-
 module ControlSpecHelper
   attr_writer :basepath, :basebranch
 
@@ -32,11 +30,11 @@ module ControlSpecHelper
   end
 
   def role_path
-    File.join(project_root, @basepath, 'role')
+    File.join(project_root, basepath, 'role')
   end
 
   def profile_path
-    File.join(project_root, @basepath, 'profile')
+    File.join(project_root, basepath, 'profile')
   end
 
   def diff_from_base
@@ -93,7 +91,7 @@ module ControlSpecHelper
            else
              fail ArgumentError
            end
-    path = [project_root, @basepath, test[:path], 'spec', test[:type]].compact
+    path = [project_root, basepath, test[:path], 'spec', test[:type]].compact
     File.join(path << (klass.split('::') - [test[:path]])) + '_spec.rb'
 
   end
@@ -109,6 +107,7 @@ module ControlSpecHelper
 
   def profile_fixtures
     Dir.chdir(profile_path) do
+      debug(ENV['debug'])
       debug("cd to #{profile_path}")
       profile_ln = './spec/fixtures/modules/profile'
 
