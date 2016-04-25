@@ -279,6 +279,23 @@ describe 'control_spec_helper' do
   end
 
   describe 'when r10k is called' do
+    cached_env_debug = ''
+    original_stderr = $stderr
+    original_stdout = $stdout
+
+    before(:each) do
+      allow(@dummy_class).to receive(:project_root).and_return('/')
+      allow(@dummy_class).to receive(:`).with('r10k puppetfile install')
+      # Redirect stderr and stdout
+      $stderr = File.new(File.join('/', 'dev', 'null'), 'w')
+      $stdout = File.new(File.join('/', 'dev', 'null'), 'w')
+    end
+
+    after(:each) do
+      $stderr = original_stderr
+      $stdout = original_stdout
+    end
+
     it 'should call the appropriate r10k command' do
       allow(@dummy_class).to receive(:project_root).and_return('/')
       expect(@dummy_class).to receive(:`).with('r10k puppetfile install')
