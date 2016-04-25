@@ -18,8 +18,8 @@ describe 'control_spec_helper' do
       allow(@dummy_class).to receive(:project_root).and_return('/')
       allow(@dummy_class).to receive(:`).with('r10k puppetfile install')
       # Redirect stderr and stdout
-      $stderr = File.new(File.join('/', 'dev', 'null'), 'w')
-      $stdout = File.new(File.join('/', 'dev', 'null'), 'w')
+      $stderr = File.open(File::NULL, 'w')
+      $stdout = File.open(File::NULL, 'w')
     end
 
     after(:each) do
