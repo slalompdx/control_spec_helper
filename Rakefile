@@ -5,7 +5,7 @@ require 'rspec/core/rake_task'
 require 'git'
 
 task :default do
-  sh %{rake -T}
+  sh %(rake -T)
 end
 
 require 'fileutils'
@@ -19,51 +19,55 @@ def version
 end
 
 namespace :package do
-  desc "Create the gem"
+  desc 'Create the gem'
   task :gem do
-    spec = Gem::Specification.load("control_spec_helper.gemspec")
-    Dir.mkdir("pkg") rescue nil
-    if Gem::Version.new(`gem -v`) >= Gem::Version.new("2.0.0.a")
+    spec = Gem::Specification.load('control_spec_helper.gemspec')
+    begin
+      Dir.mkdir('pkg')
+    rescue => e
+      puts e
+    end
+    if Gem::Version.new(`gem -v`) >= Gem::Version.new('2.0.0.a')
       Gem::Package.build(spec)
     else
       Gem::Builder.new(spec).build
     end
-    FileUtils.move("control_spec_helper-#{version}.gem", "pkg")
+    FileUtils.move("control_spec_helper-#{version}.gem", 'pkg')
   end
 end
 
 desc 'Run rubocop against tree'
 task :rubocop do
-  `rubocop`
+  puts `rubocop`
 end
 
-desc "Cleanup pkg directory"
+desc 'Cleanup pkg directory'
 task :clean do
-  FileUtils.rm_rf("pkg")
+  FileUtils.rm_rf('pkg')
 end
 
 namespace :fixtures do
-  desc "Prepare fixtures directory"
+  desc 'Prepare fixtures directory'
   task :create do
     FileUtils.mkdir('fixtures') unless File.directory?('fixtures')
   end
 
-  desc "Remove fixtures directory"
+  desc 'Remove fixtures directory'
   task :clean do
     FileUtils.rm_rf('fixtures')
   end
 
-  desc "Prepare fixtures repository"
-  task :prep => [:create] do
+  desc 'Prepare fixtures repository'
+  task prep: [:create] do
     begin
       unless File.exist?('fixtures/puppet-control')
-        repo = Git.clone('https://github.com/slalompdx/puppet-control.git',
-                         'puppet-control',
-                         :path => 'fixtures',
-                         :branch => 'fixture')
+        Git.clone('https://github.com/slalompdx/puppet-control.git',
+                  'puppet-control',
+                  path: 'fixtures',
+                  branch: 'fixture')
         Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
           `bundle config local.control_spec_helper ../..`
-          puts "#{`bundle install`}"
+          puts `bundle install`
         end
       end
     ensure

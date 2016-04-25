@@ -1,7 +1,7 @@
 # lib/tasks/acceptance.rb
 
 desc 'Run acceptance tests for 1 or more roles'
-task :acceptance => [:spec_clean] do
+task acceptance: [:spec_clean] do
   role = if ENV['role'] || ENV['roles']
            (ENV['role'] || ENV['roles']).split(',')
          elsif !diff_roles.empty?
@@ -13,7 +13,7 @@ task :acceptance => [:spec_clean] do
 
   puts "-- Acceptance tests for #{role.join(', ')} --"
   paths = role.map do |klass|
-    if klass.match(/^role/)
+    if klass =~ /^role/
       spec_from_class(klass)
     else
       spec_from_class("role::#{klass}")
