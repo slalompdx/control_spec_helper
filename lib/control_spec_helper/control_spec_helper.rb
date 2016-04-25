@@ -109,6 +109,8 @@ module ControlSpecHelper
     debug "cd to #{Dir.pwd}"
   end
 
+  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/MethodLength
   def profile_fixtures
     Dir.chdir(profile_path) do
       debug(ENV['debug'])
@@ -128,7 +130,10 @@ module ControlSpecHelper
     end
     debug "cd to #{Dir.pwd}"
   end
+  # rubocop:enable Metrics/MethodLength
+  # rubocop:enable Metrics/AbcSize
 
+  # rubocop:disable Metrics/AbcSize
   def spec_clean
     Dir.chdir(project_root) do
       debug("cd to #{project_root}")
@@ -143,4 +148,5 @@ module ControlSpecHelper
     end
     debug "cd to #{Dir.pwd}"
   end
+  # rubocop:enable Metrics/AbcSize
 end
