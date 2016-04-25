@@ -1,4 +1,4 @@
-Gemfile.lock
 pkg/
 .*.sw
 *.swp
+fixtures/puppet-control/*
