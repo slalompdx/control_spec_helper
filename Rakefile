@@ -32,6 +32,11 @@ namespace :package do
   end
 end
 
+desc 'Run rubocop against tree'
+task :rubocop do
+  `rubocop`
+end
+
 desc "Cleanup pkg directory"
 task :clean do
   FileUtils.rm_rf("pkg")
