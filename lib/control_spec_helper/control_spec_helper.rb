@@ -27,17 +27,15 @@ module ControlSpecHelper
 
   def project_root
     return @root if @root
-    @root = `git rev-parse --show-toplevel`.chomp
-    debug("project_root = #{@root}")
-    @root
+    File.dirname(file_name)
   end
 
   def role_path
-    File.join(project_root, basepath, 'role')
+    @role_path || File.join(project_root, basepath, 'role')
   end
 
   def profile_path
-    File.join(project_root, basepath, 'profile')
+    @profile_path || File.join(project_root, basepath, 'profile')
   end
 
   def diff_from_base
