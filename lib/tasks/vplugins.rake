@@ -2,5 +2,5 @@
 
 desc 'install Vagrant plugins'
 task :vplugins do
-  exec 'vagrant plugin install vagrant-auto_network vagrant-hosts'
+  `unset RUBYLIB ; vagrant plugin install vagrant-auto_network vagrant-hosts`
 end
