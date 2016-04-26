@@ -16,53 +16,54 @@ describe 'control_spec_helper' do
       before(:each) do
         allow(@dummy_class).to receive(:profile_path).and_return('/')
         allow(File).to receive(:symlink)
-          .with('/', './spec/fixtures/modules/profile')
+          .with('/', '/tmp/spec/fixtures/modules/profile')
       end
 
       context 'if a profile link already exists' do
         it 'should not try to symlink the profile path' do
-          allow(Dir).to receive(:glob).with('../../modules/*').and_return([])
+          allow(Dir).to receive(:glob).with('/tmp/../../modules/*').and_return([])
           allow(File).to receive(:exists?)
-            .with('./spec/fixtures/modules/profile').and_return(true)
+            .with('/tmp/spec/fixtures/modules/profile').and_return(true)
           expect(File).to_not receive(:symlink)
-            .with('/', './spec/fixtures/modules/profile')
-          allow(FileUtils).to receive(:mkpath).with('./spec/fixtures/modules/')
+            .with('/', '/tmp/spec/fixtures/modules/profile')
+          allow(FileUtils).to receive(:mkpath).with('/tmp/spec/fixtures/modules/')
           expect { @dummy_class.profile_fixtures }
         end
       end
 
       context 'if a profile link does not already exist' do
         it 'should symlink the profile path' do
-          allow(Dir).to receive(:glob).with('../../modules/*').and_return([])
+          allow(Dir).to receive(:glob).with('/tmp/../../modules/*').and_return([])
           allow(File).to receive(:exists?)
-            .with('./spec/fixtures/modules/profile').and_return(false)
+            .with('/tmp/spec/fixtures/modules/profile').and_return(false)
+          allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
           expect(File).to receive(:symlink)
-            .with('/', './spec/fixtures/modules/profile')
+            .with('/', '/tmp/spec/fixtures/modules/profile')
           allow(FileUtils).to receive(:mkpath)
-            .with('./spec/fixtures/modules/')
+            .with('/tmp/spec/fixtures/modules/')
           @dummy_class.profile_fixtures
         end
       end
 
       context 'when iterating through available modules' do
         before(:each) do
-          allow(Dir).to receive(:glob).with('../../modules/*')
+          allow(Dir).to receive(:glob).with('/tmp/../../modules/*')
             .and_return(%w(foo bar))
           allow(File).to receive(:exists?)
-            .with('./spec/fixtures/modules/profile').and_return(true)
+            .with('/tmp/spec/fixtures/modules/profile').and_return(true)
         end
 
         context 'if discovered file is not a directory' do
           it 'should not try to perform module operations on that file' do
-            allow(File).to receive(:directory?).with('./spec/fixtures/modules')
+            allow(File).to receive(:directory?).with('/tmp/spec/fixtures/modules')
               .and_return(true)
             allow(File).to receive(:directory?).with('foo').and_return(false)
             allow(File).to receive(:directory?).with('bar').and_return(false)
-            allow(File).to receive(:dirname).with(__FILE__).and_return('/tmp')
+            allow(File).to receive(:dirname).with(file_name).and_return('/tmp')
             expect(File).to_not receive(:symlink)
-              .with('/tmp/foo', './spec/fixtures/modules/foo')
+              .with('/tmp/foo', '/tmp/spec/fixtures/modules/foo')
             expect(File).to_not receive(:symlink)
-              .with('/tmp/bar', './spec/fixtures/modules/bar')
+              .with('/tmp/bar', '/tmp/spec/fixtures/modules/bar')
             @dummy_class.profile_fixtures
           end
         end
@@ -71,38 +72,36 @@ describe 'control_spec_helper' do
           context 'if modules directories already are symlinks' do
             it 'should not try to symlink the module path' do
               allow(File).to receive(:directory?)
-                .with('./spec/fixtures/modules').and_return(true)
+                .with('/tmp/spec/fixtures/modules').and_return(true)
               allow(File).to receive(:directory?).with('foo').and_return(true)
               allow(File).to receive(:directory?).with('bar').and_return(true)
-              allow(File).to receive(:dirname).and_return('/tmp')
+              allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
               allow(File).to receive(:symlink?)
-                .with('./spec/fixtures/modules/foo').and_return(true)
+                .with('/tmp/spec/fixtures/modules/foo').and_return(true)
               allow(File).to receive(:symlink?)
-                .with('./spec/fixtures/modules/bar').and_return(true)
+                .with('/tmp/spec/fixtures/modules/bar').and_return(true)
               @dummy_class.profile_fixtures
             end
           end
 
           context 'if modules directories do not already have symlinks' do
             it 'should symlink the module path' do
-              allow(@dummy_class).to receive(:expanded_file_name)
+              allow(@dummy_class).to receive(:file_name)
                 .and_return('/tmp/control_spec_helper.rb')
               allow(File).to receive(:directory?)
-                .with('./spec/fixtures/modules').and_return(true)
+                .with('/tmp/spec/fixtures/modules').and_return(true)
               allow(File).to receive(:directory?)
                 .with('foo').and_return(true)
               allow(File).to receive(:directory?)
                 .with('bar').and_return(true)
-              allow(File).to receive(:dirname)
-                .with(@dummy_class.file_name).and_return('/tmp')
               allow(File).to receive(:symlink?)
-                .with('./spec/fixtures/modules/foo').and_return(false)
+                .with('/tmp/spec/fixtures/modules/foo').and_return(false)
               allow(File).to receive(:symlink?)
-                .with('./spec/fixtures/modules/bar').and_return(false)
+                .with('/tmp/spec/fixtures/modules/bar').and_return(false)
               expect(File).to receive(:symlink)
-                .with('/tmp/foo', './spec/fixtures/modules/foo')
+                .with('/tmp/foo', '/tmp/spec/fixtures/modules/foo')
               expect(File).to receive(:symlink)
-                .with('/tmp/bar', './spec/fixtures/modules/bar')
+                .with('/tmp/bar', '/tmp/spec/fixtures/modules/bar')
               @dummy_class.profile_fixtures
             end
           end
@@ -110,13 +109,14 @@ describe 'control_spec_helper' do
           describe 'when debug environmental variable is set' do
             before(:each) do
               allow(@dummy_class).to receive(:profile_path).and_return('/')
-              allow(Dir).to receive(:glob).with('../../modules/*')
+              allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
+              allow(Dir).to receive(:glob).with('/tmp/../../modules/*')
                 .and_return([])
               allow(Dir).to receive(:pwd).and_return('/foo')
               allow(File).to receive(:exists?)
-                .with('./spec/fixtures/modules/profile').and_return(true)
+                .with('/tmp/spec/fixtures/modules/profile').and_return(true)
               allow(FileUtils).to receive(:mkpath)
-                .with('./spec/fixtures/modules/')
+                .with('/tmp/spec/fixtures/modules/')
               cached_env_debug = ENV['debug']
               ENV['debug'] = 'true'
             end
@@ -139,13 +139,14 @@ describe 'control_spec_helper' do
           context 'when debug environmental variable is not set' do
             before(:each) do
               allow(@dummy_class).to receive(:profile_path).and_return('/')
-              allow(Dir).to receive(:glob).with('../../modules/*')
+              allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
+              allow(Dir).to receive(:glob).with('/tmp/../../modules/*')
                 .and_return([])
               allow(Dir).to receive(:pwd).and_return('/foo')
               allow(File).to receive(:exists?)
-                .with('./spec/fixtures/modules/profile').and_return(true)
+                .with('/tmp/spec/fixtures/modules/profile').and_return(true)
               allow(FileUtils).to receive(:mkpath)
-                .with('./spec/fixtures/modules/')
+                .with('/tmp/spec/fixtures/modules/')
             end
 
             it 'should not print its current profile_path directory' do
@@ -166,8 +167,9 @@ describe 'control_spec_helper' do
           end
 
           it 'should create a modules directory inside fixtures' do
+            allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
             expect(FileUtils).to receive(:mkpath)
-              .with('./spec/fixtures/modules/')
+              .with('/tmp/spec/fixtures/modules/')
             @dummy_class.profile_fixtures
           end
         end
