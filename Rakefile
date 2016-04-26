@@ -61,12 +61,14 @@ namespace :fixtures do
   task prep: [:create] do
     begin
       unless File.exist?('fixtures/puppet-control')
+        puts 'Cloning puppet_control repository...'
         Git.clone('https://github.com/slalompdx/puppet-control.git',
                   'puppet-control',
                   path: 'fixtures',
                   branch: 'fixture')
         Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
           `bundle config local.control_spec_helper ../..`
+          puts 'Installing dependencies...'
           puts `bundle install`
         end
       end
