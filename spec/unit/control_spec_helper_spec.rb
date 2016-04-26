@@ -52,49 +52,35 @@ describe 'control_spec_helper' do
     expect(@dummy_class.puppet_cmd).to eq(cmd)
   end
 
-  describe 'when root is set' do
-    describe 'when project_root is called' do
-      it 'should return a matching project_root' do
-        @dummy_class.instance_variable_set(:@root, '/projroot')
-        expect(@dummy_class.project_root).to eq('/projroot')
-      end
+  context 'if role_path is already set' do
+    it 'should return the predefined role_path' do
+      @dummy_class.instance_variable_set(:@role_path, '/role')
+      @dummy_class.basepath = 'dist'
+      expect(@dummy_class.role_path).to eq('/role')
     end
   end
 
-  describe 'when root is not set' do
-    describe 'when project_root is called' do
-      git_string = 'git rev-parse --show-toplevel'
-
-      it 'calls the appropriate git command' do
-        expect(@dummy_class).to receive(:`).with(git_string)
-          .and_return('foo')
-        @dummy_class.project_root
-      end
-
-      describe 'result' do
-        let(:test_root) { '/test_root' }
-
-        before do
-          allow(@dummy_class).to receive(:`).with(git_string)
-            .and_return(test_root)
-        end
-
-        it 'should return a programmatically-determined project_root' do
-          expect(@dummy_class.project_root).to eq('/test_root')
-        end
-      end
+  context 'if role_path is not locally set' do
+    it 'should return a role_path based on basepath' do
+      @dummy_class.instance_variable_set(:@root, '/projroot')
+      @dummy_class.basepath = 'dist'
+      expect(@dummy_class.role_path).to eq('/projroot/dist/role')
     end
   end
 
-  it 'should return a role_path based on basepath' do
-    @dummy_class.instance_variable_set(:@root, '/projroot')
-    @dummy_class.basepath = 'dist'
-    expect(@dummy_class.role_path).to eq('/projroot/dist/role')
+  context 'if profile_path is already set' do
+    it 'should return the predefined profile_path' do
+      @dummy_class.instance_variable_set(:@profile_path, '/prof')
+      @dummy_class.basepath = 'dist'
+      expect(@dummy_class.profile_path).to eq('/prof')
+    end
   end
 
-  it 'should return a profile_path based on basepath' do
-    @dummy_class.instance_variable_set(:@root, '/projroot')
-    @dummy_class.basepath = 'dist'
-    expect(@dummy_class.profile_path).to eq('/projroot/dist/profile')
+  context 'if profile_path is not locally set' do
+    it 'should return a profile_path based on basepath' do
+      @dummy_class.instance_variable_set(:@root, '/projroot')
+      @dummy_class.basepath = 'dist'
+      expect(@dummy_class.profile_path).to eq('/projroot/dist/profile')
+    end
   end
 end

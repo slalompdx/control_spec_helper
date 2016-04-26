@@ -20,24 +20,10 @@ describe 'control_spec_helper' do
 
   describe 'when root is not set' do
     describe 'when project_root is called' do
-      git_string = 'git rev-parse --show-toplevel'
-
-      it 'calls the appropriate git command' do
-        expect(@dummy_class).to receive(:`).with(git_string)
-          .and_return('foo')
-        @dummy_class.project_root
-      end
-
       describe 'result' do
-        let(:test_root) { '/test_root' }
-
-        before do
-          allow(@dummy_class).to receive(:`).with(git_string)
-            .and_return(test_root)
-        end
-
         it 'should return a programmatically-determined project_root' do
-          expect(@dummy_class.project_root).to eq('/test_root')
+          allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
+          expect(@dummy_class.project_root).to eq('/tmp')
         end
       end
     end
