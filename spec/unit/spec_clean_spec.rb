@@ -115,6 +115,7 @@ describe 'control_spec_helper' do
       begin
         expect { @dummy_class.spec_clean }
       rescue => e
+        puts e
       end
     end
     # rubocop:enable Lint/UselessAssignment

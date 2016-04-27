@@ -1,3 +1,6 @@
+# rubocop:disable Metrics/ModuleLength
+
+# Test control repositories, similar to puppetlabs_spec_helper
 module ControlSpecHelper
   attr_writer :basepath, :basebranch
 
@@ -38,38 +41,40 @@ module ControlSpecHelper
   end
 
   def diff_from_base
-    `git diff #{@basebranch} --cached --diff-filter=ACMR --name-only`.split("\n")
+    `git diff #{@basebranch} --cached --diff-filter=ACMR --name-only`
+      .split("\n")
   end
 
   def diff_roles
-    diff_from_base.
-      select { |file| file.match(%r{site/role/manifests}) }.
-      map { |path| class_from_path(path) }
+    diff_from_base
+      .select { |file| file.match(%r{site/role/manifests}) }
+      .map { |path| class_from_path(path) }
   end
 
   def diff_profile
-    diff_from_base.
-      select { |file| file.match(%r{site/profile/manifests}) }.
-      map { |path| class_from_path(path) }
+    diff_from_base
+      .select { |file| file.match(%r{site/profile/manifests}) }
+      .map { |path| class_from_path(path) }
   end
 
   # This is for role and profile modules only
   def class_from_path(path)
     return nil unless path =~ /manifests.+\.pp$/
 
-    (path.sub(project_root + '/', '').
-      sub(/\.pp$/, '').
-      split('/') - %w(site manifests)).
-      join('::')
+    (path.sub(project_root + '/', '')
+      .sub(/\.pp$/, '')
+      .split('/') - %w(site manifests))
+      .join('::')
   end
 
   def roles_that_include(klass)
     roles = ''
     Dir.chdir(role_path) do
       debug("cd to #{role_path}")
-      roles = `git grep -l #{klass}`.split("\n").
-        map { |path| class_from_path(File.join(role_path, path)) }.
-        compact
+      roles = `git grep -l #{klass}`
+              .split("\n")
+              .map { |path| class_from_path(File.join(role_path, path)) }
+              .compact
     end
     debug "cd to #{Dir.pwd}"
     roles
@@ -85,15 +90,14 @@ module ControlSpecHelper
 
   def spec_from_class(klass)
     test = if klass =~ /profile/
-             { :path => 'profile', :type => nil }
+             { path: 'profile', type: nil }
            elsif klass =~ /role/
-             { :path => 'role', :type => 'acceptance' }
+             { path: 'role', type: 'acceptance' }
            else
-             fail ArgumentError
+             raise ArgumentError
            end
     path = [project_root, basepath, test[:path], 'spec', test[:type]].compact
     File.join(path << (klass.split('::') - [test[:path]])) + '_spec.rb'
-
   end
 
   def r10k
@@ -105,6 +109,8 @@ module ControlSpecHelper
     debug "cd to #{Dir.pwd}"
   end
 
+  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/MethodLength
   def profile_fixtures
     Dir.chdir(profile_path) do
       debug(ENV['debug'])
@@ -112,7 +118,7 @@ module ControlSpecHelper
       profile_ln = './spec/fixtures/modules/profile'
 
       FileUtils.mkpath './spec/fixtures/modules/'
-      File.symlink(profile_path, profile_ln) unless File.exists?(profile_ln)
+      File.symlink(profile_path, profile_ln) unless File.exist?(profile_ln)
 
       Dir.glob('../../modules/*').each do |folder|
         next unless File.directory?(folder)
@@ -124,7 +130,10 @@ module ControlSpecHelper
     end
     debug "cd to #{Dir.pwd}"
   end
+  # rubocop:enable Metrics/MethodLength
+  # rubocop:enable Metrics/AbcSize
 
+  # rubocop:disable Metrics/AbcSize
   def spec_clean
     Dir.chdir(project_root) do
       debug("cd to #{project_root}")
@@ -139,4 +148,5 @@ module ControlSpecHelper
     end
     debug "cd to #{Dir.pwd}"
   end
+  # rubocop:enable Metrics/AbcSize
 end
