@@ -143,8 +143,8 @@ module ControlSpecHelper
       abort if fixtures == '' || !fixtures
       abort if modules == '' || !modules
 
-      `rm -rf #{fixtures}/*`
-      `rm -rf #{modules}/*`
+      FileUtils.rm_rf(fixtures)
+      FileUtils.rm_rf(modules)
     end
     debug "cd to #{Dir.pwd}"
   end
