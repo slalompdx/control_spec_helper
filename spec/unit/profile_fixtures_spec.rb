@@ -59,7 +59,7 @@ describe 'control_spec_helper' do
               .and_return(true)
             allow(File).to receive(:directory?).with('foo').and_return(false)
             allow(File).to receive(:directory?).with('bar').and_return(false)
-            allow(File).to receive(:dirname).with(file_name).and_return('/tmp')
+            allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
             expect(File).to_not receive(:symlink)
               .with('/tmp/foo', '/tmp/spec/fixtures/modules/foo')
             expect(File).to_not receive(:symlink)

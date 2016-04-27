@@ -2,7 +2,7 @@
 
 # Test control repositories, similar to puppetlabs_spec_helper
 module ControlSpecHelper
-  attr_writer :basepath, :basebranch
+  attr_writer :basepath, :basebranch, :root
 
   def file_name
     __FILE__
@@ -27,7 +27,9 @@ module ControlSpecHelper
 
   def project_root
     return @root if @root
-    File.dirname(file_name)
+    @root = `git rev-parse --show-toplevel`.chomp
+    debug("project_root = #{@root}")
+    @root
   end
 
   def role_path
