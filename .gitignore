@@ -3,3 +3,5 @@ pkg/
 *.swp
 fixtures/puppet-control/*
 *.*~
+.bundle/*
+vendor/*
