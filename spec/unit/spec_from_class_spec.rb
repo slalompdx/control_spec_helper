@@ -22,7 +22,7 @@ describe 'control_spec_helper' do
                     "spec/classes/klass/repo_spec.rb\n" \
                     'spec/classes/stages_spec.rb')
       expect(@dummy_class.roles_that_include('klass'))
-        .to eq(["::klass", "::klass::repo", "::stages"])
+        .to eq(['::klass', '::klass::repo', '::stages'])
     end
 
     describe 'when asked to identify a spec file based on class name' do
@@ -51,11 +51,13 @@ describe 'control_spec_helper' do
         end
 
         it 'should place a role spec in the correct path' do
+          valid_output =
+            '/test_root/control_spec_helper/role/spec/acceptance/klass_spec.rb'
           allow(@dummy_class).to receive(:project_root).and_return('/')
           allow(@dummy_class).to receive(:basepath)
             .and_return('/test_root/control_spec_helper')
           expect(@dummy_class.spec_from_class(role_klass))
-            .to eq('/test_root/control_spec_helper/role/spec/acceptance/klass_spec.rb')
+            .to eq(valid_output)
         end
       end
     end

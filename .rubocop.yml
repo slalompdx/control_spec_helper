@@ -1,3 +1,6 @@
+AllCops:
+  Exclude:
+    - 'fixtures/**/*'
 Metrics/AbcSize:
   Severity: warning
 Metrics/CyclomaticComplexity:

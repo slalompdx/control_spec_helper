@@ -1,3 +1,3 @@
 # lib/tasks/default.rb
 
-task :default => [:help]
+task default: [:help]
