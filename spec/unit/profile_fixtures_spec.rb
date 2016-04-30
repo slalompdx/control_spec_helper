@@ -21,19 +21,22 @@ describe 'control_spec_helper' do
 
       context 'if a profile link already exists' do
         it 'should not try to symlink the profile path' do
-          allow(Dir).to receive(:glob).with('/tmp/../../modules/*').and_return([])
+          allow(Dir).to receive(:glob).with('/tmp/../../modules/*')
+            .and_return([])
           allow(File).to receive(:exists?)
             .with('/tmp/spec/fixtures/modules/profile').and_return(true)
           expect(File).to_not receive(:symlink)
             .with('/', '/tmp/spec/fixtures/modules/profile')
-          allow(FileUtils).to receive(:mkpath).with('/tmp/spec/fixtures/modules/')
+          allow(FileUtils).to receive(:mkpath)
+            .with('/tmp/spec/fixtures/modules/')
           expect { @dummy_class.profile_fixtures }
         end
       end
 
       context 'if a profile link does not already exist' do
         it 'should symlink the profile path' do
-          allow(Dir).to receive(:glob).with('/tmp/../../modules/*').and_return([])
+          allow(Dir).to receive(:glob).with('/tmp/../../modules/*')
+            .and_return([])
           allow(File).to receive(:exists?)
             .with('/tmp/spec/fixtures/modules/profile').and_return(false)
           allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
@@ -55,8 +58,8 @@ describe 'control_spec_helper' do
 
         context 'if discovered file is not a directory' do
           it 'should not try to perform module operations on that file' do
-            allow(File).to receive(:directory?).with('/tmp/spec/fixtures/modules')
-              .and_return(true)
+            allow(File).to receive(:directory?)
+              .with('/tmp/spec/fixtures/modules').and_return(true)
             allow(File).to receive(:directory?).with('foo').and_return(false)
             allow(File).to receive(:directory?).with('bar').and_return(false)
             allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
@@ -75,7 +78,8 @@ describe 'control_spec_helper' do
                 .with('/tmp/spec/fixtures/modules').and_return(true)
               allow(File).to receive(:directory?).with('foo').and_return(true)
               allow(File).to receive(:directory?).with('bar').and_return(true)
-              allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
+              allow(@dummy_class).to receive(:file_name)
+                .and_return('/tmp/foo.rb')
               allow(File).to receive(:symlink?)
                 .with('/tmp/spec/fixtures/modules/foo').and_return(true)
               allow(File).to receive(:symlink?)
@@ -109,7 +113,8 @@ describe 'control_spec_helper' do
           describe 'when debug environmental variable is set' do
             before(:each) do
               allow(@dummy_class).to receive(:profile_path).and_return('/')
-              allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
+              allow(@dummy_class).to receive(:file_name)
+                .and_return('/tmp/foo.rb')
               allow(Dir).to receive(:glob).with('/tmp/../../modules/*')
                 .and_return([])
               allow(Dir).to receive(:pwd).and_return('/foo')
@@ -139,7 +144,8 @@ describe 'control_spec_helper' do
           context 'when debug environmental variable is not set' do
             before(:each) do
               allow(@dummy_class).to receive(:profile_path).and_return('/')
-              allow(@dummy_class).to receive(:file_name).and_return('/tmp/foo.rb')
+              allow(@dummy_class).to receive(:file_name)
+                .and_return('/tmp/foo.rb')
               allow(Dir).to receive(:glob).with('/tmp/../../modules/*')
                 .and_return([])
               allow(Dir).to receive(:pwd).and_return('/foo')

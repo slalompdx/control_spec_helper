@@ -69,36 +69,50 @@ namespace :fixtures do
                   path: 'fixtures',
                   branch: 'fixture')
       end
-      Bundler.with_clean_env {
+      Bundler.with_clean_env do
         Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
           puts 'Copying control_spec_helper into fixtures'
-          FileUtils.mkdir "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh" unless File.exist? "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
-          FileUtils.cp "#{File.dirname(__FILE__)}/pkg/control_spec_helper-#{version}.gem", "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
+          FileUtils.mkdir(
+            "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
+          ) unless File.exist?(
+            "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
+          )
+          FileUtils.cp(
+            "#{File.dirname(__FILE__)}/pkg/control_spec_helper-#{version}.gem",
+            "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
+          )
           puts 'Bringing up test VM...'
           IO.popen('unset RUBYLIB ; vagrant up') do |io|
             io.each { |s| print s }
           end
-          c = get_vagrant_ssh_config
-          Net::SSH.start(c['HostName'], c['User'], :port => c['Port'], :password => 'vagrant') do |ssh|
-            puts ssh.exec!('cd /vagrant && gem install ./csh/*.gem --no-ri --no-rdoc')
+          c = vagrant_ssh_config
+          Net::SSH.start(
+            c['HostName'],
+            c['User'],
+            port: c['Port'],
+            password: 'vagrant'
+          ) do |ssh|
+            puts ssh.exec!(
+              'cd /vagrant && gem install ./csh/*.gem --no-ri --no-rdoc'
+            )
             puts ssh.exec!('cd /vagrant && bundle install')
             puts ssh.exec!('cd /vagrant && bundle exec rake -T')
           end
         end
-      }
+      end
     ensure
       `bundle config --delete local.control_spec_helper`
     end
   end
 end
 
-def get_vagrant_ssh_config
-  vagrant_ssh_config = {}
+def vagrant_ssh_config
+  config = {}
   `vagrant ssh-config --machine-readable`.split(',')[7]
-    .split('\n')[0..9].collect { |element| element.lstrip }
-    .each { |element|
+    .split('\n')[0..9].collect(&:lstrip)
+    .each do |element|
       key, value = element.split(' ')
-      vagrant_ssh_config[key] = value
-    }
-  vagrant_ssh_config
+      config[key] = value
+    end
+  config
 end

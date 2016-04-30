@@ -20,7 +20,7 @@ describe 'control_spec_helper' do
       it 'should print its current project directory' do
         allow(FileUtils).to receive(:rm_rf)
           .with('/tmp/spec/fixtures/modules')
-	allow(FileUtils).to receive(:rm_rf).with('/modules')
+        allow(FileUtils).to receive(:rm_rf).with('/modules')
         cached_env_debug = ENV['debug']
         ENV['debug'] = 'true'
         expect { @dummy_class.spec_clean }.to output(%r{DEBUG: cd to /})
@@ -31,7 +31,7 @@ describe 'control_spec_helper' do
       it 'should print its actual working directory' do
         allow(FileUtils).to receive(:rm_rf)
           .with('/tmp/spec/fixtures/modules')
-	allow(FileUtils).to receive(:rm_rf).with('/modules')
+        allow(FileUtils).to receive(:rm_rf).with('/modules')
         cached_env_debug = ENV['debug']
         ENV['debug'] = 'true'
         expect { @dummy_class.spec_clean }.to output(%r{DEBUG: cd to /foo})
@@ -44,7 +44,7 @@ describe 'control_spec_helper' do
       it 'should not print its current project directory' do
         allow(FileUtils).to receive(:rm_rf)
           .with('/tmp/spec/fixtures/modules')
-	allow(FileUtils).to receive(:rm_rf).with('/modules')
+        allow(FileUtils).to receive(:rm_rf).with('/modules')
         cached_env_debug = ENV['debug']
         ENV.delete('debug')
         expect { @dummy_class.spec_clean }.to_not output(%r{DEBUG: cd to /})
@@ -55,7 +55,7 @@ describe 'control_spec_helper' do
       it 'should not print its actual working directory' do
         allow(FileUtils).to receive(:rm_rf)
           .with('/tmp/spec/fixtures/modules')
-	allow(FileUtils).to receive(:rm_rf).with('/modules')
+        allow(FileUtils).to receive(:rm_rf).with('/modules')
         cached_env_debug = ENV['debug']
         ENV.delete('debug')
         expect { @dummy_class.spec_clean }.to_not output(%r{DEBUG: cd to /})
