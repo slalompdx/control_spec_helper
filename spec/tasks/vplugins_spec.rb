@@ -24,9 +24,10 @@ describe :vplugins do
         conf['User'],
         port: conf['Port'],
         password: 'vagrant'
-      ) { |ssh|
-        exec_output = ssh_exec!(ssh, 'cd /vagrant && unset RUBYLIB ; bundle exec rake vplugins', true)
-      }[2]).to eq(0)
+      ) do |ssh|
+        ssh_exec!(ssh,
+                  'cd /vagrant && unset RUBYLIB ; bundle exec rake vplugins')
+      end[2]).to eq(0)
     end
     it 'should install the vagrant-auto_network plugin' do
       expect(Net::SSH.start(
@@ -34,9 +35,9 @@ describe :vplugins do
         conf['User'],
         port: conf['Port'],
         password: 'vagrant'
-      ) { |ssh|
-        exec_output = ssh_exec!(ssh, 'unset RUBYLIB ; vagrant plugin list', true)
-      }[0].split("\n")).to include(/vagrant-auto_network/)
+      ) do |ssh|
+        ssh_exec!(ssh, 'unset RUBYLIB ; vagrant plugin list')
+      end[0].split("\n")).to include(/vagrant-auto_network/)
     end
     it 'should install the vagrant-hosts plugin' do
       expect(Net::SSH.start(
@@ -44,39 +45,9 @@ describe :vplugins do
         conf['User'],
         port: conf['Port'],
         password: 'vagrant'
-      ) { |ssh|
-        exec_output = ssh_exec!(ssh, 'unset RUBYLIB ; vagrant plugin list', true)
-      }[0].split("\n")).to include(/vagrant-hosts/)
+      ) do |ssh|
+        ssh_exec!(ssh, 'unset RUBYLIB ; vagrant plugin list')
+      end[0].split("\n")).to include(/vagrant-hosts/)
     end
   end
 end
-
-#  original_stderr = $stderr
-#  original_stdout = $stdout
-#  include_context 'rake'
-#
-#  before(:each) do
-#    # Redirect stderr and stdout
-#    $stderr = File.open(File::NULL, 'w')
-#    $stdout = File.open(File::NULL, 'w')
-#  end
-#
-#  after(:each) do
-#    $stderr = original_stderr
-#    $stdout = original_stdout
-#  end
-#
-#  it 'should install the vagrant-auto_network plugin' do
-#    subject.execute
-#    get_plugins.include? 'vagrant-auto_network'
-#  end
-#
-#  it 'should install the vagrant-hosts plugin' do
-#    subject.execute
-#    get_plugins.include? 'vagrant-hosts'
-#  end
-#end
-#
-#def get_plugins
-#  `unset RUBYLIB ; vagrant plugin list`.split("\n")
-#end

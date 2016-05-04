@@ -81,7 +81,11 @@ namespace :fixtures do
             "#{File.dirname(__FILE__)}/pkg/control_spec_helper-#{version}.gem",
             "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
           )
-          `mkdir -p #{File.dirname(__FILE__)}/fixtures/puppet-control/vendor/gems ; gem unpack #{File.dirname(__FILE__)}/fixtures/puppet-control/csh/*.gem --target=./fixtures/puppet-control/vendor/gems/`
+          FileUtils.mkdir_p("#{File.dirname(__FILE__)}/fixtures/"\
+            'puppet-control/vendor/gems')
+          `gem unpack \
+            #{File.dirname(__FILE__)}/fixtures/puppet-control/csh/*.gem \
+            --target=./fixtures/puppet-control/vendor/gems/`
           puts 'Bringing up test VM...'
           IO.popen('unset RUBYLIB ; vagrant up') do |io|
             io.each { |s| print s }
