@@ -22,7 +22,7 @@ end
 #  # => ["", "", 1, nil]
 # end
 
-def ssh_exec!(ssh, command)
+def ssh_exec!(ssh, command, debug=false)
   stdout_data = ""
   stderr_data = ""
   exit_code = nil
@@ -34,10 +34,12 @@ def ssh_exec!(ssh, command)
       end
       channel.on_data do |ch,data|
         stdout_data+=data
+        puts stdout_data
       end
 
       channel.on_extended_data do |ch,type,data|
         stderr_data+=data
+        puts stderr_data
       end
 
       channel.on_request("exit-status") do |ch,data|

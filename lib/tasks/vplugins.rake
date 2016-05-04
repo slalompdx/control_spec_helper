@@ -2,5 +2,8 @@
 
 desc 'install Vagrant plugins'
 task :vplugins do
-  `unset RUBYLIB ; vagrant plugin install vagrant-auto_network vagrant-hosts`
+  Bundler.with_clean_env do
+    puts 'Installing plugins...'
+    `unset RUBYLIB ; vagrant plugin install vagrant-auto_network vagrant-hosts`
+  end
 end

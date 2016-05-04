@@ -81,6 +81,7 @@ namespace :fixtures do
             "#{File.dirname(__FILE__)}/pkg/control_spec_helper-#{version}.gem",
             "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
           )
+          `mkdir -p #{File.dirname(__FILE__)}/fixtures/puppet-control/vendor/gems ; gem unpack #{File.dirname(__FILE__)}/fixtures/puppet-control/csh/*.gem --target=./fixtures/puppet-control/vendor/gems/`
           puts 'Bringing up test VM...'
           IO.popen('unset RUBYLIB ; vagrant up') do |io|
             io.each { |s| print s }
@@ -92,11 +93,14 @@ namespace :fixtures do
             port: c['Port'],
             password: 'vagrant'
           ) do |ssh|
-            puts ssh.exec!(
+            puts 'Installing control_spec_helper gem...'
+            ssh.exec!(
               'cd /vagrant && gem install ./csh/*.gem --no-ri --no-rdoc'
             )
-            puts ssh.exec!('cd /vagrant && bundle install')
-            puts ssh.exec!('cd /vagrant && bundle exec rake -T')
+            puts 'Running bundle install...'
+            ssh.exec!('cd /vagrant && bundle install')
+            puts 'Installing vagrant...'
+            puts ssh.exec!('sudo rpm -ivh https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm')
           end
         end
       end
