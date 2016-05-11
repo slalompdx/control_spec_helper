@@ -1,6 +1,10 @@
 require 'net/ssh'
 require 'etc'
 
+def debug(msg)
+  $stderr.puts "DEBUG: #{msg}" unless ENV['debug'].nil?
+end
+
 def vagrant_ssh_config
   config = {}
   `unset RUBYLIB ; vagrant ssh-config --machine-readable`.split(',')[7]

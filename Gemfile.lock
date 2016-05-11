@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    control_spec_helper (0.0.2)
+    control_spec_helper (0.0.3)
       mocha (~> 1.1)
       puppet (~> 4.0)
       puppet-lint (~> 1.1)
@@ -106,4 +106,4 @@ DEPENDENCIES
   rubocop (~> 0.39)
 
 BUNDLED WITH
-   1.11.2
+   1.12.2

@@ -16,10 +16,6 @@ module ControlSpecHelper
     @basebranch ||= 'master'
   end
 
-  def debug(msg)
-    $stderr.puts "DEBUG: #{msg}" unless ENV['debug'].nil?
-  end
-
   def puppet_cmd
     'puppet apply manifests/site.pp \
       --modulepath $(echo `pwd`/modules:`pwd`/site) --hiera_config hiera.yaml'
@@ -101,12 +97,13 @@ module ControlSpecHelper
   end
 
   def r10k
+    debug "cd to #{Dir.pwd}"
     Dir.chdir(project_root) do
       debug("cd to #{project_root}")
       puts 'Installing modules with r10k'
       `r10k puppetfile install`
     end
-    debug "cd to #{Dir.pwd}"
+    return $?.exitstatus
   end
 
   # rubocop:disable Metrics/AbcSize

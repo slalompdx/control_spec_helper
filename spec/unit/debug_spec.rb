@@ -13,7 +13,7 @@ describe 'control_spec_helper' do
     it 'should print properly-formatted debugging messages' do
       cached_env_debug = ENV['debug']
       ENV['debug'] = 'true'
-      expect { @dummy_class.debug('spec') }.to output("DEBUG: spec\n").to_stderr
+      expect { debug('spec') }.to output("DEBUG: spec\n").to_stderr
       ENV['debug'] = cached_env_debug
     end
   end
@@ -22,7 +22,7 @@ describe 'control_spec_helper' do
     it 'should suppress debugging messages' do
       cached_env_debug = ENV['debug']
       ENV.delete('debug')
-      expect { @dummy_class.debug('spec') }.to_not output('DEBUG: spec')
+      expect { debug('spec') }.to_not output('DEBUG: spec')
         .to_stderr
       ENV['debug'] = cached_env_debug
     end

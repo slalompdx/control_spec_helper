@@ -1,7 +1,7 @@
 pkg/
 .*.sw
 *.swp
-fixtures/puppet-control/*
+fixtures/*
 *.*~
 .bundle/*
 vendor/*

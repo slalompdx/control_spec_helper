@@ -2,5 +2,5 @@
 
 desc 'install all modules from the Puppetfile (idempotent)'
 task :r10k do
-  r10k
+  abort if r10k != 0
 end

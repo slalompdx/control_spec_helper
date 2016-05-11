@@ -42,30 +42,32 @@ describe :vplugins do
         password: 'vagrant'
       ) do |ssh|
         ssh_exec!(ssh,
-                  'cd /vagrant && unset RUBYLIB ; bundle exec rake vplugins')
+                  'cd /vagrant ; bundle exec rake vplugins')
       end[2]).to eq(0)
     end
 
     it 'should install the vagrant-auto_network plugin' do
-      expect(Net::SSH.start(
+      response = Net::SSH.start(
         conf['HostName'],
         conf['User'],
         port: conf['Port'],
         password: 'vagrant'
       ) do |ssh|
         ssh_exec!(ssh, 'unset RUBYLIB ; vagrant plugin list')
-      end[0].split("\n")).to include(/vagrant-auto_network/)
+      end
+      expect(response[0].split("\n")).to include(/vagrant-auto_network/)
     end
 
     it 'should install the vagrant-hosts plugin' do
-      expect(Net::SSH.start(
+      response = Net::SSH.start(
         conf['HostName'],
         conf['User'],
         port: conf['Port'],
         password: 'vagrant'
       ) do |ssh|
         ssh_exec!(ssh, 'unset RUBYLIB ; vagrant plugin list')
-      end[0].split("\n")).to include(/vagrant-hosts/)
+      end
+      expect(response[0].split("\n")).to include(/vagrant-hosts/)
     end
   end
 end
