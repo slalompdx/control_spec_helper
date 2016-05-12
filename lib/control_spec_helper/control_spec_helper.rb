@@ -1,5 +1,7 @@
 # rubocop:disable Metrics/ModuleLength
 
+require 'English'
+
 # Test control repositories, similar to puppetlabs_spec_helper
 module ControlSpecHelper
   attr_writer :basepath, :basebranch, :root
@@ -103,7 +105,7 @@ module ControlSpecHelper
       puts 'Installing modules with r10k'
       `r10k puppetfile install`
     end
-    return $?.exitstatus
+    $CHILD_STATUS.exitstatus
   end
 
   # rubocop:disable Metrics/AbcSize
