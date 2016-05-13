@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'net/ssh'
 
 describe :r10k do
   include_context 'rake'
@@ -28,6 +27,7 @@ describe :r10k do
         port: conf['Port'],
         password: 'vagrant'
       )
+      ssh_exec!(@connection, 'cp /vagrant/fixtures/bashrc ~/.bashrc')
       $stderr = File.open(File::NULL, 'w')
       $stdout = File.open(File::NULL, 'w')
     end
@@ -37,12 +37,33 @@ describe :r10k do
       $stdout = original_stdout
     end
 
-    it 'should run r10k and return successfully' do
-      ssh_exec!(@connection, 'cp /vagrant/fixtures/bashrc ~/.bashrc')
-      r10k_return = ssh_exec!(@connection,
-                              'cd /vagrant ; bundle exec rake r10k')
-      expect(r10k_return[2]).to eq(0)
-      debug(r10k_return)
+    context 'when Puppetfile is valid' do
+      it 'should run r10k and return successfully' do
+        r10k_return = ssh_exec!(@connection,
+                                'cd /vagrant ; bundle exec rake r10k')
+        expect(r10k_return[2]).to eq(0)
+        debug(r10k_return)
+      end
+    end
+    context 'when Puppetfile is invalid' do
+      before(:all) do
+        Git.open("#{File.dirname(__FILE__)}/../../fixtures/puppet-control")
+           .checkout('bad_puppetfile')
+      end
+      after(:all) do
+        Git.open("#{File.dirname(__FILE__)}/../../fixtures/puppet-control")
+           .checkout('fixture')
+      end
+      it 'should run r10k and return an error code' do
+        r10k_return = ssh_exec!(@connection,
+                                'cd /vagrant ; bundle exec rake r10k')
+        expect(r10k_return[2]).to_not eq(0)
+      end
+      it 'should run r10k and return an error message' do
+        r10k_return = ssh_exec!(@connection,
+                                'cd /vagrant ; bundle exec rake r10k')
+        expect(r10k_return[1]).to match(/ERROR/)
+      end
     end
   end
 end

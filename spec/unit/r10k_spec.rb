@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'git'
 
 class DummyClass
   include ControlSpecHelper
@@ -52,6 +53,12 @@ describe 'control_spec_helper' do
       it 'should print its actual working directory' do
         allow(Dir).to receive(:pwd).and_return('/tmp')
         expect { @dummy_class.r10k }.to output(%r{cd to /tmp}).to_stderr
+      end
+
+      context 'when Puppetfile is valid' do
+        it 'should return a success code' do
+          expect(@dummy_class.r10k[2]).to eq(0)
+        end
       end
     end
   end
