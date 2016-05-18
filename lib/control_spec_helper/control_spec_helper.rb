@@ -114,17 +114,17 @@ module ControlSpecHelper
     Dir.chdir(profile_path) do
       debug(ENV['debug'])
       debug("cd to #{profile_path}")
-      profile_ln = "#{File.dirname(file_name)}/spec/fixtures/modules/profile"
+      profile_ln = "#{Dir.pwd}/spec/fixtures/modules/profile"
 
-      FileUtils.mkpath "#{File.dirname(file_name)}/spec/fixtures/modules/"
+      FileUtils.mkpath "#{Dir.pwd}/spec/fixtures/modules/"
       File.symlink(profile_path, profile_ln) unless File.exist?(profile_ln)
 
-      Dir.glob("#{File.dirname(file_name)}/../../modules/*").each do |folder|
+      Dir.glob("#{Dir.pwd}/../../modules/*").each do |folder|
         next unless File.directory?(folder)
-        old_path = File.join(File.dirname(file_name), folder)
-        new_path = "#{File.dirname(file_name)}/spec/fixtures/modules/" \
+        old_path = File.join(profile_path, '..', '..', 'modules',
+                             File.basename(folder))
+        new_path = "#{Dir.pwd}/spec/fixtures/modules/" \
           "#{File.basename(folder)}"
-
         File.symlink(old_path, new_path) unless File.symlink?(new_path)
       end
     end
