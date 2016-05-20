@@ -30,4 +30,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rubocop', '~> 0.39'
   s.add_development_dependency 'r10k', '~> 2.2'
   s.add_development_dependency 'net-ssh', '~> 3.1'
+  s.add_development_dependency 'fakefs', '~> 0.8'
 end
