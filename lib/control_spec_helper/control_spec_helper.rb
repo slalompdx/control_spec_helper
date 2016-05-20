@@ -117,7 +117,13 @@ module ControlSpecHelper
       profile_ln = "#{Dir.pwd}/spec/fixtures/modules/profile"
 
       FileUtils.mkpath "#{Dir.pwd}/spec/fixtures/modules/"
-      File.symlink(profile_path, profile_ln) unless File.exist?(profile_ln)
+      puts "===== #{profile_ln}"
+      puts "===== #{profile_path}"
+      puts "===== #{Dir.pwd}"
+      puts "===== #{File.exist?(profile_ln)}"
+      #File.symlink(profile_path, profile_ln) unless File.exist?(profile_ln)
+      puts "====== REACHED PLACE 1 ======"
+      puts "======= REACHED THE PLACE =======" unless File.exist?(profile_ln)
 
       Dir.glob("#{Dir.pwd}/../../modules/*").each do |folder|
         next unless File.directory?(folder)
