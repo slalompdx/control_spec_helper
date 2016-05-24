@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe :spec_prep do
   include_context 'rake'
+  include_context 'control'
 
   before(:all) do
     @original_dir = Dir.pwd
