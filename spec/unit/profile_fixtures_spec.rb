@@ -1,22 +1,19 @@
 require 'spec_helper'
-require 'fakefs'
 
 class DummyClass
   include ControlSpecHelper
 end
 
-describe 'control_spec_helper', fakefs:true do
-  include FakeFS::SpecHelpers
-
-  before do
+describe 'control_spec_helper' do
+  before(:each) do
     @dummy_class = DummyClass.new
     @cached_env_debug = ''
     @original_stderr = $stderr
     @original_stdout = $stdout
-    $stderr = File.new(File::NULL, 'w')
-    $stdout = File.new(File::NULL, 'w')
+#    $stderr = File.open(File::NULL, 'w')
+#    $stdout = File.open(File::NULL, 'w')
   end
-  after do
+  after(:each) do
     $stderr = @original_stderr
     $stdout = @original_stdout
   end
@@ -33,18 +30,34 @@ describe 'control_spec_helper', fakefs:true do
 
       context 'if a profile link already exists' do
         it 'should not try to symlink the profile path' do
+          allow(File).to receive(:exist?)
+                     .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
+                           "spec/fixtures/modules/profile")
+                     .and_return(true)
+          allow(@dummy_class)
+            .to receive(:profile_path)
+            .and_return("#{Dir.pwd}/fixtures/puppet-control/site/profile")
           expect(File).to_not receive(:symlink)
-                      .with('/tmp/site/profiles',
-                            '/tmp/spec/fixtures/modules/profile')
+                      .with("#{Dir.pwd}/fixtures/puppet-control/site/profile",
+                            "#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
+                            "spec/fixtures/modules/profile")
           @dummy_class.profile_fixtures
         end
       end
 
       context 'if a profile link does not already exist' do
         it 'should symlink the profile path' do
+          allow(File).to receive(:exist?)
+                     .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
+                           "spec/fixtures/modules/profile")
+                     .and_return(false)
+          allow(@dummy_class)
+            .to receive(:profile_path)
+            .and_return("#{Dir.pwd}/fixtures/puppet-control/site/profile")
           expect(File).to receive(:symlink)
-#                      .with('/tmp/site/profiles',
-#                            '/tmp/spec/fixtures/modules/profile')
+                      .with("#{Dir.pwd}/fixtures/puppet-control/site/profile",
+                            "#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
+                            "spec/fixtures/modules/profile")
           @dummy_class.profile_fixtures
         end
       end

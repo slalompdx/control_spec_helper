@@ -121,7 +121,7 @@ module ControlSpecHelper
       puts "===== #{profile_path}"
       puts "===== #{Dir.pwd}"
       puts "===== #{File.exist?(profile_ln)}"
-      #File.symlink(profile_path, profile_ln) unless File.exist?(profile_ln)
+      File.symlink(profile_path, profile_ln) unless File.exist?(profile_ln)
       puts "====== REACHED PLACE 1 ======"
       puts "======= REACHED THE PLACE =======" unless File.exist?(profile_ln)
 
