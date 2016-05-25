@@ -103,8 +103,13 @@ namespace :fixtures do
             )
             puts 'Running bundle install...'
             ssh.exec!('cd /vagrant && bundle install')
-            puts 'Installing vagrant...'
-            puts ssh.exec!('sudo rpm -ivh https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm')
+            ssh.exec!('rpm -qa | grep vagrant')
+            if $?.exitstatus != 0
+              puts 'Installing vagrant...'
+              puts ssh.exec!('sudo rpm -ivh https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm')
+            else
+              puts "Skipping vagrant install, already present..."
+            end
           end
         end
       end
