@@ -12,6 +12,9 @@ describe 'control_spec_helper' do
     @original_stdout = $stdout
 #    $stderr = File.open(File::NULL, 'w')
 #    $stdout = File.open(File::NULL, 'w')
+    allow(@dummy_class)
+      .to receive(:profile_path)
+      .and_return("#{Dir.pwd}/fixtures/puppet-control/site/profile")
   end
   after(:each) do
     $stderr = @original_stderr
@@ -34,9 +37,6 @@ describe 'control_spec_helper' do
                      .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
                            "spec/fixtures/modules/profile")
                      .and_return(true)
-          allow(@dummy_class)
-            .to receive(:profile_path)
-            .and_return("#{Dir.pwd}/fixtures/puppet-control/site/profile")
           expect(File).to_not receive(:symlink)
                       .with("#{Dir.pwd}/fixtures/puppet-control/site/profile",
                             "#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
@@ -51,9 +51,6 @@ describe 'control_spec_helper' do
                      .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
                            "spec/fixtures/modules/profile")
                      .and_return(false)
-          allow(@dummy_class)
-            .to receive(:profile_path)
-            .and_return("#{Dir.pwd}/fixtures/puppet-control/site/profile")
           expect(File).to receive(:symlink)
                       .with("#{Dir.pwd}/fixtures/puppet-control/site/profile",
                             "#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
