@@ -120,14 +120,11 @@ module ControlSpecHelper
       File.symlink(profile_path, profile_ln) unless File.exist?(profile_ln)
 
       Dir.glob("#{Dir.pwd}/../../modules/*").each do |folder|
-        puts "HHHHHHHHHHH #{folder} directory: #{File.directory?(folder)}"
         next unless File.directory?(folder)
-        puts "IIIIIIIIIII #{folder}"
         old_path = File.join(profile_path, '..', '..', 'modules',
                              File.basename(folder))
         new_path = "#{Dir.pwd}/spec/fixtures/modules/" \
           "#{File.basename(folder)}"
-        puts "!!!=== SYMLINK #{old_path} #{new_path}"
         File.symlink(old_path, new_path) unless File.symlink?(new_path)
 
       end

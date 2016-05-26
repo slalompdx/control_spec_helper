@@ -10,8 +10,8 @@ describe 'control_spec_helper' do
     @cached_env_debug = ''
     @original_stderr = $stderr
     @original_stdout = $stdout
-#    $stderr = File.open(File::NULL, 'w')
-#    $stdout = File.open(File::NULL, 'w')
+    $stderr = File.open(File::NULL, 'w')
+    $stdout = File.open(File::NULL, 'w')
     allow(@dummy_class)
       .to receive(:profile_path)
       .and_return("#{Dir.pwd}/fixtures/puppet-control/site/profile")
