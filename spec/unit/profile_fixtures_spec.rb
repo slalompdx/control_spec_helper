@@ -15,6 +15,7 @@ describe 'control_spec_helper' do
     allow(@dummy_class)
       .to receive(:profile_path)
       .and_return("#{Dir.pwd}/fixtures/puppet-control/site/profile")
+    FileUtils.rm_rf("/proj/slalom/control_spec_helper/fixtures/puppet-control/site/profile/spec/fixtures/modules/profile")
   end
   after(:each) do
     $stderr = @original_stderr
@@ -26,6 +27,12 @@ describe 'control_spec_helper' do
       before(:each) do
         @cached_env_debug = ENV['debug']
         ENV['debug'] = 'true'
+        allow(Dir)
+          .to receive(:glob)
+          .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/../../modules/*")
+          .and_return(["#{Dir.pwd}/fixtures/puppet-control/site/profile/../../modules/concat",
+                      "#{Dir.pwd}/fixtures/puppet-control/site/profile/../../modules/epel"])
+
       end
       after(:each) do
         ENV['debug'] = @cached_env_debug
@@ -55,35 +62,94 @@ describe 'control_spec_helper' do
                       .with("#{Dir.pwd}/fixtures/puppet-control/site/profile",
                             "#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
                             "spec/fixtures/modules/profile")
+          expect(File).to receive(:symlink).at_least(1).times
           @dummy_class.profile_fixtures
         end
       end
 
       context 'when iterating through available modules' do
+        before(:each) do
+          allow(Dir).to receive(:glob)
+                    .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/../../modules/*")
+                    .and_return([
+                                "#{Dir.pwd}/fixtures/puppet-control/site/"\
+                                "profile/../../modules/concat",
+                                "#{Dir.pwd}/fixtures/puppet-control/site/"\
+                                "profile/../../modules/epel",
+                    ])
+        end
         context 'if discovered file is not a directory' do
-          it 'should not try to perform module operations on that file'
+          before(:each) do
+            allow(File).to receive(:directory?)
+                       .with("#{Dir.pwd}/fixtures/puppet-control/modules/concat").and_return(false)
+            allow(File).to receive(:directory?)
+                       .with("#{Dir.pwd}/fixtures/puppet-control/modules/epel")
+          end
+          it 'should not try to perform module operations on that file' do
+            expect(File).to_not receive(:symlink?)
+                        .with("#{Dir.pwd}/fixtures/puppet-control/site/profile"\
+                              "/../../modules/concat")
+          end
         end
 
         context 'if discovered file is a directory' do
+          before(:each) do
+            allow(FileUtils).to receive(:mkpath).with("#{Dir.pwd}/fixtures/puppet-control/site/profile/spec/fixtures/modules/").and_return(true)
+            allow(File).to receive(:directory?)
+                       .with("#{Dir.pwd}/fixtures/puppet-control/site/profile"\
+                             "/../../modules/concat").and_return(true)
+            allow(File).to receive(:directory?)
+                       .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/../../modules/epel")
+          end
           context 'if modules directories already are symlinks' do
-            it 'should not try to symlink the module path'
+            before(:each) do
+              allow(File).to receive(:symlink?)
+                         .with("#{Dir.pwd}/fixtures/puppet-control/site/"\
+                               "profile/../../modules/concat")
+                         .and_return(true)
+              allow(File).to receive(:symlink?).at_least(2).times
+            end
+            it 'should not try to symlink the module path' do
+              expect(File).to_not receive(:symlink)
+                          .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/../../modules/"\
+                                "concat",
+                                "#{Dir.pwd}/spec/fixtures/modules/concat")
+              @dummy_class.profile_fixtures
+            end
           end
 
           context 'if modules directories do not already have symlinks' do
-            it 'should symlink the module path'
+            before(:each) do
+              allow(File).to receive(:symlink?)
+                         .with("#{Dir.pwd}/fixtures/puppet-control/site/"\
+                               "profile/spec/fixtures/modules/concat")
+                         .and_return(false)
+              allow(File).to receive(:directory?)
+                         .with("#{Dir.pwd}/fixtures/puppet-control/site/"\
+                               "profile/../../modules/concat")
+                         .and_return(true)
+            allow(File).to receive(:directory?)
+                       .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/../../modules/epel")
+            end
+            it 'should symlink the module path' do
+              expect(File).to receive(:symlink)
+                          .with("#{Dir.pwd}/fixtures/puppet-control/site/"\
+                                "profile",
+                                "#{Dir.pwd}/fixtures/puppet-control/site/"\
+                                "profile/spec/fixtures/modules/profile")
+              expect(File).to receive(:symlink)
+                          .with("#{Dir.pwd}/fixtures/puppet-control/site/"\
+                                "profile/../../modules/concat",
+                                "#{Dir.pwd}/fixtures/puppet-control/site/"\
+                                "profile/spec/fixtures/modules/concat")
+              @dummy_class.profile_fixtures
+            end
           end
 
-          describe 'when debug environmental variable is set' do
-            it 'should print its current profile_path directory'
-            it 'should print its actual working directory'
+          it 'should create a modules directory inside fixtures' do
+            expect(FileUtils).to receive(:mkpath).with("#{Dir.pwd}/fixtures/puppet-control/site/profile/spec/fixtures/modules/")
+            @dummy_class.profile_fixtures
           end
-
-          context 'when debug environmental variable is not set' do
-            it 'should not print its current profile_path directory'
-            it 'should not print its actual working directory'
-          end
-
-          it 'should create a modules directory inside fixtures'
         end
       end
     end
