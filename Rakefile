@@ -134,3 +134,11 @@ namespace :fixtures do
     end
   end
 end
+
+task unit: ['fixtures:shared_prep'] do
+  exec 'bundle exec rspec -P spec/unit/*_spec.rb'
+end
+
+task acceptance: ['fixtures:prep'] do
+  exec 'bundle exec rspec -P spec/tasks/*_spec.rb'
+end
