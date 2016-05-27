@@ -4,6 +4,7 @@ require 'rubygems/package_task'
 require 'rspec/core/rake_task'
 require 'git'
 require 'net/ssh'
+require 'English'
 require './lib/slalom'
 
 task :default do
@@ -104,11 +105,12 @@ namespace :fixtures do
             puts 'Running bundle install...'
             ssh.exec!('cd /vagrant && bundle install')
             ssh.exec!('rpm -qa | grep vagrant')
-            if $?.exitstatus != 0
+            if $CHILD_STATUS.exitstatus != 0
               puts 'Installing vagrant...'
-              puts ssh.exec!('sudo rpm -ivh https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm')
+              puts ssh.exec!('sudo rpm -ivh https://releases.hashicorp.com/'\
+                             'vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm')
             else
-              puts "Skipping vagrant install, already present..."
+              puts 'Skipping vagrant install, already present...'
             end
           end
         end

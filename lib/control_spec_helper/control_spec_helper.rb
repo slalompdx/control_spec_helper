@@ -126,7 +126,6 @@ module ControlSpecHelper
         new_path = "#{Dir.pwd}/spec/fixtures/modules/" \
           "#{File.basename(folder)}"
         File.symlink(old_path, new_path) unless File.symlink?(new_path)
-
       end
     end
     debug "cd to #{Dir.pwd}"
