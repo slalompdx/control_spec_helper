@@ -41,6 +41,7 @@ describe :vplugins do
     after(:each) do
       $stderr = original_stderr
       $stdout = original_stdout
+      @connection.close
     end
 
     it 'should install successfully' do
@@ -51,6 +52,7 @@ describe :vplugins do
 
     it 'should install the vagrant-auto_network plugin' do
       response = ssh_exec!(@connection, 'unset RUBYLIB ; vagrant plugin list')
+      puts response
       expect(response[0].split("\n")).to include(/vagrant-auto_network/)
     end
 
