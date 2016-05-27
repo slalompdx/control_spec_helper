@@ -55,6 +55,16 @@ namespace :fixtures do
     FileUtils.mkdir('fixtures') unless File.directory?('fixtures')
   end
 
+  task :shared_prep do
+    unless File.exist?('fixtures/puppet-control')
+      puts 'Cloning puppet_control repository...'
+      Git.clone('https://github.com/slalompdx/puppet-control.git',
+                'puppet-control',
+                path: 'fixtures',
+                branch: 'fixture')
+    end
+  end
+
   desc 'Remove fixtures directory'
   task :clean do
     if File.exist?('fixtures/puppet-control')
@@ -66,15 +76,8 @@ namespace :fixtures do
   end
 
   desc 'Prepare fixtures repository'
-  task prep: [:create, 'package:gem'] do
+  task prep: [:create, 'package:gem', :shared_prep] do
     begin
-      unless File.exist?('fixtures/puppet-control')
-        puts 'Cloning puppet_control repository...'
-        Git.clone('https://github.com/slalompdx/puppet-control.git',
-                  'puppet-control',
-                  path: 'fixtures',
-                  branch: 'fixture')
-      end
       Bundler.with_clean_env do
         Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
           puts 'Copying control_spec_helper into fixtures'

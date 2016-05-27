@@ -31,4 +31,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'r10k', '~> 2.2'
   s.add_development_dependency 'net-ssh', '~> 3.1'
   s.add_development_dependency 'fakefs', '~> 0.8'
+  s.add_development_dependency 'listen', '3.1.1'
+  s.add_development_dependency 'guard', '~> 2.14'
+  s.add_development_dependency 'guard-rspec', '~> 4.7'
 end
