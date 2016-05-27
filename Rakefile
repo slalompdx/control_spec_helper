@@ -100,15 +100,15 @@ namespace :fixtures do
           )
           puts 'Installing control_spec_helper gem...'
           ssh_exec!(
-              connection,
-              'cd /vagrant && gem install ./csh/*.gem --no-ri --no-rdoc'
-            )
+            connection,
+            'cd /vagrant && gem install ./csh/*.gem --no-ri --no-rdoc'
+          )
           puts 'Running bundle install...'
           ssh_exec!(connection, 'cd /vagrant && bundle install')
           response = ssh_exec!(connection, 'rpm -qa | grep vagrant')
           if response[2] != 0
             puts 'Installing vagrant...'
-            response = ssh_exec!(
+            ssh_exec!(
               connection,
               'sudo rpm -ivh https://releases.hashicorp.com/'\
               'vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm')

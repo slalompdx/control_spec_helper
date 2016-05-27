@@ -31,7 +31,7 @@ describe :spec_prep do
       $stderr = File.open(File::NULL, 'w')
       $stdout = File.open(File::NULL, 'w')
       @prep_return = ssh_exec!(@connection,
-                              'cd /vagrant ; bundle exec rake spec_prep')
+                               'cd /vagrant ; bundle exec rake spec_prep')
     end
 
     after(:each) do
@@ -57,13 +57,13 @@ describe :spec_prep do
       path_link_success = ssh_exec!(@connection,
                                     'file /vagrant/site/profile/spec/fixtures/'\
                                     'modules/profile')
-      expect(path_link_success[0]).to match /(?!broken) symbolic link/
+      expect(path_link_success[0]).to match(/(?!broken) symbolic link/)
     end
     it 'should link each module into the link directory' do
       path_link_success = ssh_exec!(@connection,
                                     'file /vagrant/site/profile/spec/fixtures/'\
                                     'modules/vcsrepo')
-      expect(path_link_success[0]).to match /(?!broken) symbolic link/
+      expect(path_link_success[0]).to match(/(?!broken) symbolic link/)
     end
   end
 end
