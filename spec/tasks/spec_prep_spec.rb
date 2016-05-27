@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe :spec_prep do
   include_context 'rake'
-  include_context 'control'
 
   before(:all) do
     @original_dir = Dir.pwd
@@ -29,10 +28,10 @@ describe :spec_prep do
         password: 'vagrant'
       )
       ssh_exec!(@connection, 'cp /vagrant/fixtures/bashrc ~/.bashrc')
+      $stderr = File.open(File::NULL, 'w')
+      $stdout = File.open(File::NULL, 'w')
       @prep_return = ssh_exec!(@connection,
                               'cd /vagrant ; bundle exec rake spec_prep')
-#      $stderr = File.open(File::NULL, 'w')
-#      $stdout = File.open(File::NULL, 'w')
     end
 
     after(:each) do
@@ -57,9 +56,14 @@ describe :spec_prep do
     it 'should link the profile path to its link directory' do
       path_link_success = ssh_exec!(@connection,
                                     'file /vagrant/site/profile/spec/fixtures/'\
+                                    'modules/profile')
+      expect(path_link_success[0]).to match /(?!broken) symbolic link/
+    end
+    it 'should link each module into the link directory' do
+      path_link_success = ssh_exec!(@connection,
+                                    'file /vagrant/site/profile/spec/fixtures/'\
                                     'modules/vcsrepo')
       expect(path_link_success[0]).to match /(?!broken) symbolic link/
     end
-    it 'should link each module into the link directory'
   end
 end

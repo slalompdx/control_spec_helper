@@ -66,7 +66,6 @@ describe 'control_spec_helper' do
             .with("#{Dir.pwd}/fixtures/puppet-control/site/profile",
                   "#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
                   'spec/fixtures/modules/profile')
-          expect(File).to receive(:symlink).at_least(1).times
           @dummy_class.profile_fixtures
         end
       end
