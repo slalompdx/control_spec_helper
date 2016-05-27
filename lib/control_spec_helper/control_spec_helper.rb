@@ -19,7 +19,7 @@ module ControlSpecHelper
   end
 
   def puppet_cmd
-    'puppet apply manifests/site.pp \
+    'sudo puppet apply manifests/site.pp \
       --modulepath $(echo `pwd`/modules:`pwd`/site) --hiera_config hiera.yaml'
   end
 

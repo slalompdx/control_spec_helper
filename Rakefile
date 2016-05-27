@@ -115,6 +115,8 @@ namespace :fixtures do
           else
             puts 'Skipping vagrant install, already present...'
           end
+          puts 'Linking puppet binary...'
+          ssh_exec!(connection, 'sudo ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet')
           connection.close
         end
       end
