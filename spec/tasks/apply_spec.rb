@@ -58,10 +58,10 @@ describe :apply do
           @conf_content = ssh_exec!(@connection, 'cat /etc/ntp.conf')
         end
         it 'should contain the correct ntp servers' do
-          expect(@conf_content[0]).to match /server 0.pool.ntp.org/
+          expect(@conf_content[0]).to match(/server 0.pool.ntp.org/)
         end
         it 'should not contain additional ntp servers' do
-          expect(@conf_content[0]).to_not match /server 1.pool.ntp.org/
+          expect(@conf_content[0]).to_not match(/server 1.pool.ntp.org/)
         end
       end
     end

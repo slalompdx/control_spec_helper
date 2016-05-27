@@ -46,7 +46,9 @@ describe :puppet_cmd do
 
     it 'should return the correct puppet command' do
       expect(@prep_return[0])
-        .to match("sudo puppet apply manifests/site.pp \\\n      --modulepath $(echo `pwd`/modules:`pwd`/site) --hiera_config hiera.yaml\n")
+        .to match("sudo puppet apply manifests/site.pp \\\n      --modulepath "\
+                  "$(echo `pwd`/modules:`pwd`/site) --hiera_config hiera.yaml\n"
+                 )
     end
   end
 end
