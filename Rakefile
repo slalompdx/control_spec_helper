@@ -57,6 +57,11 @@ namespace :fixtures do
 
   desc 'Remove fixtures directory'
   task :clean do
+    if File.exist?('fixtures/puppet-control')
+      Dir.chdir('fixtures/puppet-control') do
+        `unset RUBYLIB ; vagrant destroy -f`
+      end
+    end
     FileUtils.rm_rf('fixtures')
   end
 
