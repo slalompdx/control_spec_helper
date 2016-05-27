@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe :spec_clean do
+describe :puppet_cmd do
   include_context 'rake'
 
   before(:all) do
@@ -32,10 +32,7 @@ describe :spec_clean do
       $stdout = File.open(File::NULL, 'w')
       @prep_return = ssh_exec!(@connection,
                                'cd /vagrant ;'\
-                               'touch /vagrant/site/profile/spec/fixtures/'\
-                               'modules ;'\
-                               'touch /vagrant/modules ;'\
-                               'bundle exec rake spec_clean')
+                               'bundle exec rake puppet_cmd')
     end
 
     after(:each) do
@@ -47,15 +44,9 @@ describe :spec_clean do
       expect(@prep_return[2]).to eq(0)
     end
 
-    it 'should remove the fixtures path' do
-      r10k_success = ssh_exec!(@connection,
-                               'ls /vagrant/site/profile/spec/fixtures/modules')
-      expect(r10k_success[2]).to eq(2)
-    end
-    it 'should remove the modules path' do
-      r10k_success = ssh_exec!(@connection,
-                               'ls /vagrant/modules')
-      expect(r10k_success[2]).to eq(2)
+    it 'should return the correct puppet command' do
+      expect(@prep_return[0])
+        .to match("puppet apply manifests/site.pp \\\n      --modulepath $(echo `pwd`/modules:`pwd`/site) --hiera_config hiera.yaml\n")
     end
   end
 end
