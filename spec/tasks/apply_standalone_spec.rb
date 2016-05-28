@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe :apply do
+describe :apply_standalone do
   include_context 'rake'
 
   before(:all) do
@@ -40,16 +40,17 @@ describe :apply do
     context 'it should run puppet apply' do
       before(:each) do
         @puppet_return = ssh_exec!(@connection,
-                                   'cd /vagrant ; bundle exec rake apply')
+                                   'cd /vagrant ;'\
+                                   'bundle exec rake apply_standalone')
       end
       it 'should return successfully' do
         expect(@puppet_return[2]).to eq(0)
       end
-      it 'should run r10k' do
-        expect(@puppet_return[0]).to match(/Installing modules with r10k/)
-      end
       it 'should apply a catalog' do
         expect(@puppet_return[0]).to match(/Notice: Applied catalog/)
+      end
+      it 'should not run r10k' do
+        expect(@puppet_return[0]).to_not match(/Installing modules with r10k/)
       end
       it 'should activate the ntp service' do
         @ntp_return = ssh_exec!(@connection,
