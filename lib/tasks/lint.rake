@@ -16,12 +16,5 @@ PuppetLint::RakeTask.new(:lint) do |config|
     class_parameter_defaults
     documentation
   )
-  config.ignore_paths = %w(
-    tests/**/*.pp
-    vendor/**/*.pp
-    examples/**/*.pp
-    spec/**/*.pp
-    pkg/**/*.pp
-    modules/**/*.pp
-  )
+  config.ignore_paths = ['tests', 'vendor', 'examples', 'spec', 'pkg', 'modules']
 end
