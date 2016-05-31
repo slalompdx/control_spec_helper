@@ -169,6 +169,14 @@ namespace :fixtures do
     end
   end
 
+  desc 'Convenience method - Update gem on existing vm'
+  task :update_gem do
+    Rake::Task['package:gem'].invoke
+    Rake::Task['fixtures:copy_gem'].invoke
+    Rake::Task['fixtures:install_gem'].invoke
+    Rake::Task['fixtures:bundle_install'].invoke
+  end
+
   desc 'Prepare fixtures repository'
   task prep: [:create, 'package:gem', :shared_prep] do
     Rake::Task['fixtures:vm'].invoke
