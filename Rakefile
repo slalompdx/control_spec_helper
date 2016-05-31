@@ -75,63 +75,108 @@ namespace :fixtures do
     FileUtils.rm_rf('fixtures')
   end
 
-  desc 'Prepare fixtures repository'
-  task prep: [:create, 'package:gem', :shared_prep] do
-    begin
-      Bundler.with_clean_env do
-        Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
-          puts 'Copying control_spec_helper into fixtures'
-          FileUtils.mkdir(
-            "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
-          ) unless File.exist?(
-            "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
-          )
-          FileUtils.cp(
-            "#{File.dirname(__FILE__)}/pkg/control_spec_helper-#{version}.gem",
-            "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
-          )
-          FileUtils.mkdir_p("#{File.dirname(__FILE__)}/fixtures/"\
-            'puppet-control/vendor/gems')
-          `gem unpack \
-            #{File.dirname(__FILE__)}/fixtures/puppet-control/csh/*.gem \
-            --target=./fixtures/puppet-control/vendor/gems/`
-          puts 'Bringing up test VM...'
-          IO.popen('unset RUBYLIB ; vagrant up') do |io|
-            io.each { |s| print s }
-          end
-          c = vagrant_ssh_config
-          connection = Net::SSH.start(
-            c['HostName'],
-            c['User'],
-            port: c['Port'],
-            password: 'vagrant'
-          )
-          puts 'Installing control_spec_helper gem...'
-          ssh_exec!(
-            connection,
-            'cd /vagrant && gem install ./csh/*.gem --no-ri --no-rdoc'
-          )
-          puts 'Running bundle install...'
-          ssh_exec!(connection, 'cd /vagrant && bundle install')
-          response = ssh_exec!(connection, 'rpm -qa | grep vagrant')
-          if response[2] != 0
-            puts 'Installing vagrant...'
-            ssh_exec!(
-              connection,
-              'sudo rpm -ivh https://releases.hashicorp.com/'\
-              'vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm')
-          else
-            puts 'Skipping vagrant install, already present...'
-          end
-          puts 'Linking puppet binary...'
-          ssh_exec!(connection,
-                    'sudo ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet')
-          connection.close
+  desc 'Bring up test vm'
+  task vm: [:create, 'package:gem', :shared_prep] do
+    Bundler.with_clean_env do
+      Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
+        puts 'Bringing up test VM...'
+        IO.popen('unset RUBYLIB ; vagrant up') do |io|
+          io.each { |s| print s }
         end
       end
-    ensure
-      `bundle config --delete local.control_spec_helper`
     end
+  end
+
+  desc 'Copy built gem into fixtures directory'
+  task copy_gem: [:create, 'package:gem', :shared_prep] do
+    Bundler.with_clean_env do
+      Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
+        puts 'Copying control_spec_helper into fixtures'
+        FileUtils.mkdir(
+          "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
+        ) unless File.exist?(
+          "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
+        )
+        FileUtils.cp(
+          "#{File.dirname(__FILE__)}/pkg/control_spec_helper-#{version}.gem",
+          "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
+        )
+        FileUtils.mkdir_p("#{File.dirname(__FILE__)}/fixtures/"\
+          'puppet-control/vendor/gems')
+        `gem unpack \
+          #{File.dirname(__FILE__)}/fixtures/puppet-control/csh/*.gem \
+          --target=./fixtures/puppet-control/vendor/gems/`
+      end
+    end
+  end
+
+  desc 'Install control_spec_helper gem on client vm'
+  task install_gem: [:copy_gem] do
+    Bundler.with_clean_env do
+      Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
+        connection = build_vagrant_connection(vagrant_ssh_config)
+        puts 'Installing control_spec_helper gem...'
+        ssh_exec!(
+          connection,
+          'cd /vagrant && gem install ./csh/*.gem --no-ri --no-rdoc'
+        )
+        connection.close
+      end
+    end
+  end
+
+  desc 'Run bundle install on client vm'
+  task bundle_install: [:install_gem] do
+    Bundler.with_clean_env do
+      Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
+        connection = build_vagrant_connection(vagrant_ssh_config)
+        puts 'Running bundle install...'
+        ssh_exec!(connection, 'cd /vagrant && bundle install')
+        connection.close
+      end
+    end
+  end
+
+  desc 'Install vagrant on client vm'
+  task install_vagrant: [:vm] do
+    Bundler.with_clean_env do
+      Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
+        connection = build_vagrant_connection(vagrant_ssh_config)
+        response = ssh_exec!(connection, 'rpm -qa | grep vagrant')
+        if response[2] != 0
+          puts 'Installing vagrant...'
+          ssh_exec!(
+            connection,
+            'sudo rpm -ivh https://releases.hashicorp.com/'\
+            'vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm')
+        else
+          puts 'Skipping vagrant install, already present...'
+        end
+      end
+    end
+  end
+
+  desc 'Link puppet binary on client vm'
+  task link_puppet: [:vm] do
+    Bundler.with_clean_env do
+      Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
+        connection = build_vagrant_connection(vagrant_ssh_config)
+        puts 'Linking puppet binary...'
+        ssh_exec!(connection,
+                  'sudo ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet')
+        connection.close
+      end
+    end
+  end
+
+  desc 'Prepare fixtures repository'
+  task prep: [:create, 'package:gem', :shared_prep] do
+    Rake::Task['fixtures:vm'].invoke
+    Rake::Task['fixtures:copy_gem'].invoke
+    Rake::Task['fixtures:install_gem'].invoke
+    Rake::Task['fixtures:bundle_install'].invoke
+    Rake::Task['fixtures:install_vagrant'].invoke
+    Rake::Task['fixtures:link_puppet'].invoke
   end
 end
 

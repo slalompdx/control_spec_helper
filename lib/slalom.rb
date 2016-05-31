@@ -16,6 +16,15 @@ def vagrant_ssh_config
   config
 end
 
+def build_vagrant_connection(config)
+  Net::SSH.start(
+    config['HostName'],
+    config['User'],
+    port: config['Port'],
+    password: 'vagrant'
+  )
+end
+
 # Helper method to separate ssh output into streams and error code
 # Sample use:
 # Net::SSH.start(server, Etc.getlogin) do |ssh|
