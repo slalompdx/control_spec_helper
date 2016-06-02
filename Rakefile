@@ -169,6 +169,18 @@ namespace :fixtures do
     end
   end
 
+  desc 'Run r10k on client vm'
+  task run_r10k: [:vm] do
+    Bundler.with_clean_env do
+      Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
+        connection = build_vagrant_connection(vagrant_ssh_config)
+        puts 'Running r10k on vm...'
+        ssh_exec!(connection,
+                  'cd /vagrant ; bundle exec rake r10k')
+        connection.close
+      end
+    end
+  end
   desc 'Convenience method - Update gem on existing vm'
   task :update_gem do
     Rake::Task['package:gem'].invoke
@@ -185,6 +197,7 @@ namespace :fixtures do
     Rake::Task['fixtures:bundle_install'].invoke
     Rake::Task['fixtures:install_vagrant'].invoke
     Rake::Task['fixtures:link_puppet'].invoke
+    Rake::Task['fixtures:run_r10k'].invoke
   end
 end
 
