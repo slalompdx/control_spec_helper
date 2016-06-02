@@ -92,19 +92,11 @@ namespace :fixtures do
     Bundler.with_clean_env do
       Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
         puts 'Copying control_spec_helper into fixtures'
-        FileUtils.mkdir(
-          "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
-        ) unless File.exist?(
-          "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
-        )
-        FileUtils.cp(
-          "#{File.dirname(__FILE__)}/pkg/control_spec_helper-#{version}.gem",
-          "#{File.dirname(__FILE__)}/fixtures/puppet-control/csh"
-        )
-        FileUtils.mkdir_p("#{File.dirname(__FILE__)}/fixtures/"\
-          'puppet-control/vendor/gems')
+        FileUtils.mkdir_p('./vendor/cache') unless File.exist?('./vendor/cache')
+        FileUtils.mkdir_p('./vendor/gems') unless File.exist?('./vendor/gems')
+        FileUtils.cp("../../pkg/control_spec_helper-#{version}.gem", './vendor/cache')
         `gem unpack \
-          #{File.dirname(__FILE__)}/fixtures/puppet-control/csh/*.gem \
+          ./vendor/cache/*.gem \
           --target=./fixtures/puppet-control/vendor/gems/`
       end
     end
@@ -118,7 +110,7 @@ namespace :fixtures do
         puts 'Installing control_spec_helper gem...'
         ssh_exec!(
           connection,
-          'cd /vagrant && gem install ./csh/*.gem --no-ri --no-rdoc'
+          'cd /vagrant && gem install ./vendor/cache/*.gem --no-ri --no-rdoc'
         )
         connection.close
       end
@@ -131,7 +123,7 @@ namespace :fixtures do
       Dir.chdir("#{File.dirname(__FILE__)}/fixtures/puppet-control") do
         connection = build_vagrant_connection(vagrant_ssh_config)
         puts 'Running bundle install...'
-        ssh_exec!(connection, 'cd /vagrant && bundle install')
+        ssh_exec!(connection, 'cd /vagrant && bundle install --path=vendor/')
         connection.close
       end
     end
