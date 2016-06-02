@@ -11,7 +11,8 @@ else
   RSpec.configure do |c|
     # Project root
     proj_root = File.expand_path(
-      File.join(File.dirname(__FILE__), '..', '..', '..'))
+      File.join(File.dirname(__FILE__), '..', '..', '..')
+    )
 
     # Readable test descriptions
     c.formatter = :documentation

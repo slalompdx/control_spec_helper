@@ -94,7 +94,8 @@ namespace :fixtures do
         puts 'Copying control_spec_helper into fixtures'
         FileUtils.mkdir_p('./vendor/cache') unless File.exist?('./vendor/cache')
         FileUtils.mkdir_p('./vendor/gems') unless File.exist?('./vendor/gems')
-        FileUtils.cp("../../pkg/control_spec_helper-#{version}.gem", './vendor/cache')
+        FileUtils.cp("../../pkg/control_spec_helper-#{version}.gem",
+                     './vendor/cache')
         `gem unpack \
           ./vendor/cache/*.gem \
           --target=./fixtures/puppet-control/vendor/gems/`
@@ -140,7 +141,8 @@ namespace :fixtures do
           ssh_exec!(
             connection,
             'sudo rpm -ivh https://releases.hashicorp.com/'\
-            'vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm')
+            'vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm'
+          )
         else
           puts 'Skipping vagrant install, already present...'
         end
