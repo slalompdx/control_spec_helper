@@ -157,7 +157,9 @@ namespace :fixtures do
         connection = build_vagrant_connection(vagrant_ssh_config)
         puts 'Linking puppet binary...'
         ssh_exec!(connection,
-                  'sudo ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet')
+                  'sudo ls /usr/bin/puppet || '\
+                  'sudo ln -s /opt/puppetlabs/bin/puppet /usr/bin/puppet'
+                 )
         connection.close
       end
     end

@@ -62,7 +62,7 @@ describe :lint do
       it 'should run r10k and return an error message' do
         lint_return = ssh_exec!(@connection,
                                 'cd /vagrant ; bundle exec rake lint')
-        expect(lint_return[1]).to match(/ERROR/)
+        expect(lint_return[0]).to match(/ERROR/)
       end
     end
   end
