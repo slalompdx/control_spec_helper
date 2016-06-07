@@ -5,7 +5,7 @@
 # we require to import for the PuppetLint::RakeTask
 require 'puppet-lint/tasks/puppet-lint'
 
-Rake::Task[:lint].clear
+Rake::Task[:lint].clear if Rake::Task.task_defined? :lint
 # Relative is not able to be set within the context of PuppetLint::RakeTask
 PuppetLint.configuration.relative = true
 PuppetLint::RakeTask.new(:lint) do |config|
@@ -22,5 +22,6 @@ PuppetLint::RakeTask.new(:lint) do |config|
     examples/**/*.pp
     spec/**/*.pp
     pkg/**/*.pp
+    modules/**/**/*.pp
   )
 end
