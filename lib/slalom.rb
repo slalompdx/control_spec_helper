@@ -6,14 +6,15 @@ def debug(msg)
 end
 
 def vagrant_ssh_config
-  config = {}
-  `unset RUBYLIB ; vagrant ssh-config --machine-readable`.split(',')[7]
-    .split('\n')[0..9].collect(&:lstrip)
-    .each do |element|
-      key, value = element.split(' ')
-      config[key] = value
+  out = `unset RUBYLIB ; vagrant ssh-config --machine-readable`
+  out.split("\n")[1]
+    .split(',').last
+    .split('\n')
+    .map(&:strip)
+    .reduce({}) do |a, e|
+      key, value = e.split
+      a.merge(key => value)
     end
-  config
 end
 
 def build_vagrant_connection(config)
