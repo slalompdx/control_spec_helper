@@ -197,10 +197,12 @@ namespace :fixtures do
   end
 end
 
+desc 'Execute unit tests'
 task unit: ['fixtures:shared_prep'] do
   exec 'bundle exec rspec -P spec/unit/*_spec.rb'
 end
 
+desc 'Execute acceptance tests'
 task acceptance: ['fixtures:prep'] do
   exec 'bundle exec rspec -P spec/tasks/*_spec.rb'
 end
