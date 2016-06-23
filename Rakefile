@@ -5,7 +5,7 @@ require 'rspec/core/rake_task'
 require 'git'
 require 'net/ssh'
 require 'English'
-require './lib/slalom'
+require 'control_spec_helper/util'
 
 task :default do
   sh %(rake -T)

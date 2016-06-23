@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require 'control_spec_helper/generate'
+
+ControlSpecHelper::Generate.skeleton
+
+# vi:ft=ruby
