@@ -22,7 +22,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'rake', '~> 11.0'
   s.add_runtime_dependency 'rspec-puppet', '~> 2.4'
   s.add_runtime_dependency 'puppet', '~> 4.0'
-  s.add_runtime_dependency 'puppet-lint', '~> 1.1'
   s.add_runtime_dependency 'puppet-syntax', '~> 2.1'
   s.add_runtime_dependency 'mocha', '~> 1.1'
   s.add_runtime_dependency 'git', '~> 1.3'
@@ -32,6 +31,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'listen', '3.1.1'
   s.add_runtime_dependency 'guard', '~> 2.14'
   s.add_runtime_dependency 'guard-rspec', '~> 4.7'
+  s.add_runtime_dependency 'puppet-lint', '~> 2.0'
   s.add_development_dependency 'pry', '~> 0.10'
   s.add_development_dependency 'fakefs', '~> 0.8'
 end
