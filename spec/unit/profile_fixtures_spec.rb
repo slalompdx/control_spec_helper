@@ -12,11 +12,13 @@ describe 'control_spec_helper' do
     @original_stdout = $stdout
     $stderr = File.open(File::NULL, 'w')
     $stdout = File.open(File::NULL, 'w')
+    @calculated_control_path = File.join(Dir.pwd, 'fixtures', 'puppet-control')
+    @calculated_profile_path = File.join(@calculated_control_path, 'site', 'profile')
+    @calculated_fixtures_profile_path = File.join(@calculated_profile_path, 'fixtures', 'puppet-control', 'site', 'profile')
     allow(@dummy_class)
       .to receive(:profile_path)
-      .and_return("#{Dir.pwd}/fixtures/puppet-control/site/profile")
-    FileUtils.rm_rf("#{Dir.pwd}/fixtures/puppet-control/site/profile/spec/"\
-                    'fixtures/modules/profile')
+      .and_return(@calculated_profile_path)
+    FileUtils.rm_rf(File.join(@calculated_profile_path, 'spec', 'fixtures', 'modules', 'profile'))
   end
   after(:each) do
     $stderr = @original_stderr
@@ -30,12 +32,9 @@ describe 'control_spec_helper' do
         ENV['debug'] = 'true'
         allow(Dir)
           .to receive(:glob)
-          .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/../../modules"\
-                '/*')
-          .and_return(["#{Dir.pwd}/fixtures/puppet-control/site/profile/../../"\
-                       'modules/concat',
-                       "#{Dir.pwd}/fixtures/puppet-control/site/profile/../../"\
-                       'modules/epel'])
+          .with(File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', '*'))
+          .and_return([File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'concat'),
+                       File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'epel')])
       end
 
       after(:each) do
@@ -45,13 +44,10 @@ describe 'control_spec_helper' do
       context 'if a profile link already exists' do
         it 'should not try to symlink the profile path' do
           allow(File).to receive(:exist?)
-            .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
-                  'spec/fixtures/modules/profile')
+            .with(File.join(@calculated_fixtures_profile_path, 'spec', 'fixtures', 'modules', 'profile'))
             .and_return(true)
           expect(File).to_not receive(:symlink)
-            .with("#{Dir.pwd}/fixtures/puppet-control/site/profile",
-                  "#{Dir.pwd}/fixtures/puppet-control/site/profile/spec/"\
-                  'fixtures/modules/profile')
+            .with(@calculated_fixtures_profile_path, File.join(@calculated_fixtures_profile_path), 'spec', 'fixtures', 'module', 'profile')
           @dummy_class.profile_fixtures
         end
       end
@@ -59,13 +55,10 @@ describe 'control_spec_helper' do
       context 'if a profile link does not already exist' do
         it 'should symlink the profile path' do
           allow(File).to receive(:exist?)
-            .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
-                  'spec/fixtures/modules/profile')
+            .with(File.join(@calculated_fixtures_profile_path, 'spec', 'fixtures', 'modules', 'profile'))
             .and_return(false)
           expect(File).to receive(:symlink)
-            .with("#{Dir.pwd}/fixtures/puppet-control/site/profile",
-                  "#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
-                  'spec/fixtures/modules/profile')
+            .with(@calculated_fixtures_profile_path, File.join(@calculated_fixtures_profile_path, 'spec', 'fixtures', 'modules', 'profile'))
           @dummy_class.profile_fixtures
         end
       end
@@ -73,27 +66,23 @@ describe 'control_spec_helper' do
       context 'when iterating through available modules' do
         before(:each) do
           allow(Dir).to receive(:glob)
-            .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/../"\
-                  '../modules/*')
+            .with(File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', '*'))
             .and_return([
-                          "#{Dir.pwd}/fixtures/puppet-control/site/"\
-                          'profile/../../modules/concat',
-                          "#{Dir.pwd}/fixtures/puppet-control/site/"\
-                          'profile/../../modules/epel'
+                          File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'concat'),
+                          File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'epel')
                         ])
         end
         context 'if discovered file is not a directory' do
           before(:each) do
             allow(File).to receive(:directory?)
-              .with("#{Dir.pwd}/fixtures/puppet-control/modules/concat")
+              .with(@calculated_control_path, 'modules', 'concat')
               .and_return(false)
             allow(File).to receive(:directory?)
-              .with("#{Dir.pwd}/fixtures/puppet-control/modules/epel")
+              .with(@calculated_control_path, 'modules', 'epel')
           end
           it 'should not try to perform module operations on that file' do
             expect(File).to_not receive(:symlink?)
-              .with("#{Dir.pwd}/fixtures/puppet-control/site/profile"\
-                    '/../../modules/concat')
+              .with(@calculated_fixtures_profile_path, '..', '..', 'modules', 'concat')
           end
         end
 
@@ -101,30 +90,25 @@ describe 'control_spec_helper' do
           before(:each) do
             allow(FileUtils)
               .to receive(:mkpath)
-              .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/spec/"\
-                    'fixtures/modules/')
+              .with(File.join(@calculated_fixtures_profile_path, 'spec', 'fixtures', 'modules'))
               .and_return(true)
             allow(File).to receive(:directory?)
-              .with("#{Dir.pwd}/fixtures/puppet-control/site/profile"\
-                    '/../../modules/concat')
+              .with(File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'concat'))
               .and_return(true)
             allow(File).to receive(:directory?)
-              .with("#{Dir.pwd}/fixtures/puppet-control/site/profile"\
-                    '/../../modules/epel')
+              .with(File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'epel'))
           end
           context 'if modules directories already are symlinks' do
             before(:each) do
               allow(File).to receive(:symlink?)
-                .with("#{Dir.pwd}/fixtures/puppet-control/site/"\
-                      'profile/../../modules/concat')
+                .with(File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'concat'))
                 .and_return(true)
               allow(File).to receive(:symlink?).at_least(2).times
             end
             it 'should not try to symlink the module path' do
               expect(File).to_not receive(:symlink)
-                .with("#{Dir.pwd}/fixtures/puppet-control/site/"\
-                      'profile/../../modules/concat',
-                      "#{Dir.pwd}/spec/fixtures/modules/concat")
+                .with(File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'concat'),
+                      File.join(Dir.pwd, 'spec', 'fixtures', 'modules', 'concat'))
               @dummy_class.profile_fixtures
             end
           end
@@ -132,27 +116,19 @@ describe 'control_spec_helper' do
           context 'if modules directories do not already have symlinks' do
             before(:each) do
               allow(File).to receive(:symlink?)
-                .with("#{Dir.pwd}/fixtures/puppet-control/site/"\
-                      'profile/spec/fixtures/modules/concat')
+                .with(File.join(@calculated_fixtures_profile_path, 'spec', 'fixtures', 'modules', 'concat'))
                 .and_return(false)
               allow(File).to receive(:directory?)
-                .with("#{Dir.pwd}/fixtures/puppet-control/site/"\
-                      'profile/../../modules/concat')
+                .with(File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'concat'))
                 .and_return(true)
               allow(File).to receive(:directory?)
-                .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/"\
-                      '../../modules/epel')
+                .with(File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'epel'))
             end
             it 'should symlink the module path' do
               expect(File).to receive(:symlink)
-                .with("#{Dir.pwd}/fixtures/puppet-control/site/profile",
-                      "#{Dir.pwd}/fixtures/puppet-control/site/"\
-                      'profile/spec/fixtures/modules/profile')
+                .with(@calculated_fixtures_profile_path, File.join(@calculated_fixtures_profile_path, 'spec', 'fixtures', 'modules', 'profile'))
               expect(File).to receive(:symlink)
-                .with("#{Dir.pwd}/fixtures/puppet-control/site/"\
-                      'profile/../../modules/concat',
-                      "#{Dir.pwd}/fixtures/puppet-control/site/"\
-                      'profile/spec/fixtures/modules/concat')
+                .with(File.join(@calculated_fixtures_profile_path, '..', '..', 'modules', 'concat'), File.join(@calculated_fixtures_profile_path, 'spe', 'fixtures', 'modules', 'concat'))
               @dummy_class.profile_fixtures
             end
           end
@@ -160,8 +136,7 @@ describe 'control_spec_helper' do
           it 'should create a modules directory inside fixtures' do
             expect(FileUtils)
               .to receive(:mkpath)
-              .with("#{Dir.pwd}/fixtures/puppet-control/site/profile/spec/"\
-                    'fixtures/modules/')
+              .with(@calculated_fixtures_profile_path, 'spec', 'fixtures', 'modules')
             @dummy_class.profile_fixtures
           end
         end
