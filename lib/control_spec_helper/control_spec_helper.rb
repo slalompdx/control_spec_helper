@@ -1,9 +1,12 @@
 # rubocop:disable Metrics/ModuleLength
 
 require 'English'
+require 'control_spec_helper/debug'
 
 # Test control repositories, similar to puppetlabs_spec_helper
 module ControlSpecHelper
+  include ControlSpecHelper::Debug
+
   attr_writer :basepath, :basebranch, :root
 
   def file_name
@@ -26,7 +29,7 @@ module ControlSpecHelper
   def project_root
     return @root if @root
     @root = `git rev-parse --show-toplevel`.chomp
-    debug("project_root = #{@root}")
+    Debug.log("project_root = #{@root}")
     @root
   end
 
@@ -68,13 +71,13 @@ module ControlSpecHelper
   def roles_that_include(klass)
     roles = ''
     Dir.chdir(role_path) do
-      debug("cd to #{role_path}")
+      Debug.log("cd to #{role_path}")
       roles = `git grep -l #{klass}`
               .split("\n")
               .map { |path| class_from_path(File.join(role_path, path)) }
               .compact
     end
-    debug "cd to #{Dir.pwd}"
+    Debug.log "cd to #{Dir.pwd}"
     roles
   end
 
@@ -99,9 +102,9 @@ module ControlSpecHelper
   end
 
   def r10k
-    debug "cd to #{Dir.pwd}"
+    Debug.log "cd to #{Dir.pwd}"
     Dir.chdir(project_root) do
-      debug("cd to #{project_root}")
+      Debug.log("cd to #{project_root}")
       puts 'Installing modules with r10k'
       `r10k puppetfile install`
     end
@@ -112,8 +115,7 @@ module ControlSpecHelper
   # rubocop:disable Metrics/MethodLength
   def profile_fixtures
     Dir.chdir(profile_path) do
-      debug(ENV['debug'])
-      debug("cd to #{profile_path}")
+      Debug.log("cd to #{profile_path}")
       profile_ln = "#{Dir.pwd}/spec/fixtures/modules/profile"
 
       FileUtils.mkpath "#{Dir.pwd}/spec/fixtures/modules/"
@@ -128,7 +130,7 @@ module ControlSpecHelper
         File.symlink(old_path, new_path) unless File.symlink?(new_path)
       end
     end
-    debug "cd to #{Dir.pwd}"
+    Debug.log "cd to #{Dir.pwd}"
   end
   # rubocop:enable Metrics/MethodLength
   # rubocop:enable Metrics/AbcSize
@@ -136,7 +138,7 @@ module ControlSpecHelper
   # rubocop:disable Metrics/AbcSize
   def spec_clean
     Dir.chdir(project_root) do
-      debug("cd to #{project_root}")
+      Debug.log("cd to #{project_root}")
       fixtures = File.join(profile_path, 'spec', 'fixtures', 'modules')
       modules  = File.join(project_root, 'modules')
 
@@ -146,7 +148,7 @@ module ControlSpecHelper
       FileUtils.rm_rf(fixtures)
       FileUtils.rm_rf(modules)
     end
-    debug "cd to #{Dir.pwd}"
+    Debug.log "cd to #{Dir.pwd}"
   end
   # rubocop:enable Metrics/AbcSize
 end

@@ -1,6 +1,6 @@
 require 'rake'
 require 'English'
-require './lib/slalom'
+require 'control_spec_helper/util'
 
 shared_context 'rake' do
   Dir.chdir('fixtures/puppet-control') do
