@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'puppet-syntax', '~> 2.1'
   s.add_runtime_dependency 'mocha', '~> 1.1'
   s.add_runtime_dependency 'git', '~> 1.3'
-  s.add_runtime_dependency 'rubocop', '~> 0.39'
+  s.add_runtime_dependency 'rubocop', '~> 0.49.0'
   s.add_runtime_dependency 'r10k', '~> 2.2'
   s.add_runtime_dependency 'net-ssh', '~> 3.1'
   s.add_runtime_dependency 'listen', '3.1.1'
